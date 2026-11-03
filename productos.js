@@ -115,7 +115,7 @@ window.KO_PRODUCTOS = [
     "cat": "protecciones",
     "name": "Pechera reversible Junior",
     "price": 22990,
-    "img": null,
+    "img": "recursosgraficos/pechera-junior.webp",
     "short": "Pechera Jr",
     "spec": "Más liviana, pensada para niños de 5 a 12 años.",
     "sizes": [
@@ -166,7 +166,7 @@ window.KO_PRODUCTOS = [
     "cat": "protecciones",
     "name": "Canilleras de combate",
     "price": 16990,
-    "img": null,
+    "img": "recursosgraficos/canilleras-combate.webp",
     "short": "Canilleras",
     "spec": "Protección de tibia con funda elástica.",
     "sizes": [
@@ -183,7 +183,7 @@ window.KO_PRODUCTOS = [
     "cat": "protecciones",
     "name": "Cabezal de combate",
     "price": 27990,
-    "img": null,
+    "img": "recursosgraficos/cabezal-combate.webp",
     "short": "Cabezal",
     "spec": "Disponible en azul y rojo. Cierre ajustable.",
     "sizes": [
@@ -198,7 +198,7 @@ window.KO_PRODUCTOS = [
     "cat": "protecciones",
     "name": "Guantes de combate",
     "price": 13990,
-    "img": null,
+    "img": "recursosgraficos/guantes-combate.webp",
     "short": "Guantes",
     "spec": "Dedos libres para agarrar y bloquear.",
     "sizes": [
@@ -215,7 +215,7 @@ window.KO_PRODUCTOS = [
     "cat": "protecciones",
     "name": "Protector bucal",
     "price": 3990,
-    "img": null,
+    "img": "recursosgraficos/protector-bucal.webp",
     "short": "Bucal",
     "spec": "Termomoldeable, con estuche.",
     "sizes": [],
