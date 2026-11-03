@@ -1,3 +1,7 @@
 .vercel
 .DS_Store
 Thumbs.db
+
+# Originales pesados: la web usa las versiones .webp optimizadas
+recursosgraficos/fondo.png
+recursosgraficos/kostore.png

@@ -8,6 +8,7 @@
   --chung: #1D4ED8;
   --hong: #D62839;
   --black: #000000;
+  --hero-bg: #EEEFF3; /* mismo gris claro del borde izquierdo de fondo.png */
 
   --font: "Archivo", system-ui, sans-serif;
   --wrap: 1180px;
@@ -101,20 +102,35 @@ section[id] { scroll-margin-top: 80px; }
 .btn-light:hover { background: var(--mist); }
 
 /* ---------- Hero ---------- */
-.hero { padding: clamp(56px, 9vw, 112px) 0 clamp(48px, 7vw, 88px); }
-.hero-grid {
-  display: grid;
-  grid-template-columns: 1.15fr .85fr;
-  gap: clamp(32px, 6vw, 80px);
-  align-items: center;
+/* Escritorio: la imagen se ancla a la derecha con su proporción real (sin recortar
+   productos) y su borde izquierdo se funde con el fondo gris claro del hero.
+   El texto vive en la columna izquierda, sobre el espacio libre de la imagen. */
+.hero {
+  --hero-h: clamp(520px, 44vw, 700px);
+  position: relative;
+  overflow: hidden;
+  background: var(--hero-bg);
+  min-height: var(--hero-h);
+  display: flex; align-items: center;
+  padding: 56px 0;
 }
+.hero-grid { position: relative; z-index: 1; width: 100%; }
+.hero-copy { max-width: min(560px, 46%); }
+.hero-img {
+  position: absolute; top: 0; right: 0;
+  height: 100%; width: auto; max-width: none;
+  aspect-ratio: 1671 / 941;
+  object-fit: cover;
+  -webkit-mask-image: linear-gradient(to right, transparent 12%, #000 36%);
+          mask-image: linear-gradient(to right, transparent 12%, #000 36%);
+}
+.hero .lead { max-width: 40ch; }
 .hero h1 {
   font-weight: 850;
   font-stretch: 115%;
-  font-size: clamp(2.3rem, 5.2vw, 4.25rem);
+  font-size: clamp(2.3rem, 4vw, 3.6rem);
   line-height: 1.02;
   letter-spacing: -0.025em;
-  max-width: 14ch;
 }
 .lead {
   margin-top: 28px;
@@ -124,36 +140,33 @@ section[id] { scroll-margin-top: 80px; }
 }
 .actions { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 12px; }
 
-.mat { margin: 0; justify-self: end; width: 100%; max-width: 440px; }
-.mat svg { width: 100%; height: auto; overflow: visible; }
-.mat-outer { fill: var(--mist); stroke: none; }
-.mat-oct {
-  fill: var(--paper);
-  stroke: var(--ink);
-  stroke-width: 2;
-  stroke-dasharray: 1100;
-  stroke-dashoffset: 1100;
-  animation: draw 1.4s cubic-bezier(.6,.05,.25,1) .2s forwards;
+/* Tablet horizontal: columna de texto más angosta para no tocar los productos */
+@media (max-width: 1180px) {
+  .hero { --hero-h: 500px; }
+  .hero-copy { max-width: 400px; }
+  .hero h1 { font-size: clamp(2.2rem, 4.4vw, 3.2rem); }
+  .hero .lead { font-size: 1.05rem; }
 }
-.mat-mark { stroke: var(--line); stroke-width: 2; }
-.mat-chung, .mat-hong {
-  stroke-width: 6; stroke-linecap: round;
-  opacity: 0;
-  animation: appear .5s ease-out 1.4s forwards;
-}
-.mat-chung { stroke: var(--chung); }
-.mat-hong { stroke: var(--hong); }
-.mat-label {
-  font-family: var(--font);
-  font-size: 15px; font-weight: 600;
-  opacity: 0;
-  animation: appear .5s ease-out 1.6s forwards;
-}
-.mat-label.chung { fill: var(--chung); }
-.mat-label.hong { fill: var(--hong); }
 
-@keyframes draw { to { stroke-dashoffset: 0; } }
-@keyframes appear { to { opacity: 1; } }
+/* Tablet vertical y móvil: texto arriba, imagen debajo recortada hacia los productos */
+@media (max-width: 960px) {
+  .hero {
+    display: block; min-height: 0;
+    padding: clamp(40px, 7vw, 64px) 0 0;
+  }
+  .hero-copy { max-width: 560px; }
+  .hero-img {
+    position: static; display: block;
+    width: 100%; height: auto; max-width: 100%;
+    aspect-ratio: 4 / 3;
+    object-position: 100% 75%;
+    margin-top: 28px;
+    -webkit-mask-image: none; mask-image: none;
+  }
+}
+@media (max-width: 560px) {
+  .hero-img { aspect-ratio: 1 / 1; object-position: 96% 80%; }
+}
 
 /* ---------- Service strip ---------- */
 .service { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
@@ -352,8 +365,7 @@ input:focus, textarea:focus { border-color: var(--ink); outline: none; box-shado
 }
 @media (max-width: 760px) {
   .nav { display: none; }
-  .hero-grid, .sizes, .clubs-grid { grid-template-columns: 1fr; }
-  .mat { justify-self: center; max-width: 320px; }
+  .sizes, .clubs-grid { grid-template-columns: 1fr; }
   .service-row { grid-template-columns: 1fr; }
   .service-row p { padding: 16px 0; }
   .service-row p + p { border-left: 0; border-top: 1px solid var(--line); }
@@ -371,8 +383,6 @@ input:focus, textarea:focus { border-color: var(--ink); outline: none; box-shado
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .mat-oct { stroke-dashoffset: 0; }
-  .mat-chung, .mat-hong, .mat-label { opacity: 1; }
 }
 
 /* =========================================================
