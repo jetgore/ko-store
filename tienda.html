@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tienda — KO Store</title>
+  <meta name="description" content="Catálogo completo de KO Store: doboks, protecciones, sistemas electrónicos, entrenamiento, cinturones y accesorios de taekwondo WT.">
+  <link rel="icon" type="image/png" href="recursosgraficos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#catalogo">Saltar al catálogo</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a href="index.html" class="logo" aria-label="KO Store, inicio">
+        <img src="recursosgraficos/kostore-web.webp" alt="KO Store" width="148" height="48">
+      </a>
+      <nav class="nav" aria-label="Principal">
+        <a href="index.html">Inicio</a>
+        <a href="tienda.html" aria-current="page">Tienda</a>
+        <a href="index.html#tallas">Guía de tallas</a>
+        <a href="index.html#clubes">Clubes</a>
+      </nav>
+      <button type="button" class="cart" aria-label="Abrir carro, 0 productos">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 4h2l2.4 11h11.2L21 7H6.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="9" cy="19.5" r="1.4" fill="currentColor"/><circle cx="17" cy="19.5" r="1.4" fill="currentColor"/></svg>
+        <span class="cart-count">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="shop-head">
+      <div class="wrap">
+        <h1>Tienda</h1>
+        <p class="lead" id="shopLead">Todo el equipamiento de taekwondo WT en un solo lugar.</p>
+
+        <div class="toolbar">
+          <div class="chips" id="chips" role="group" aria-label="Filtrar por categoría"></div>
+          <div class="toolbar-controls">
+            <div class="search">
+              <label for="q" class="visually-hidden">Buscar productos</label>
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <input id="q" type="search" placeholder="Buscar: pechera, cabezal, dobok…" autocomplete="off">
+            </div>
+            <div class="sort">
+              <label for="sort">Ordenar</label>
+              <select id="sort">
+                <option value="destacados">Destacados</option>
+                <option value="precio-asc">Precio: menor a mayor</option>
+                <option value="precio-desc">Precio: mayor a menor</option>
+                <option value="nombre">Nombre A–Z</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="catalogo" class="catalog">
+      <div class="wrap">
+        <p class="result-count" id="resultCount" aria-live="polite"></p>
+        <div class="products catalog-grid" id="grid"></div>
+        <div class="no-results" id="noResults" hidden>
+          <p>No hay productos que coincidan con tu búsqueda. Prueba con otra palabra o mira todas las categorías.</p>
+          <button type="button" class="btn btn-ghost" id="resetFilters">Ver todos los productos</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="service" aria-label="Condiciones de compra">
+      <div class="wrap service-row">
+        <p><strong>Envío a todo Chile</strong> Gratis sobre $60.000 en Santiago</p>
+        <p><strong>Cambio de talla</strong> Hasta 30 días, sin costo</p>
+        <p><strong>¿Dudas con la talla?</strong> <a href="index.html#tallas">Usa nuestra guía de tallas</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <a href="index.html" class="logo" aria-label="KO Store, volver al inicio">
+          <img src="recursosgraficos/kostore-web.webp" alt="KO Store" width="185" height="60" loading="lazy">
+        </a>
+        <p class="muted">Equipamiento de taekwondo WT. Santiago, Chile.</p>
+      </div>
+      <nav aria-label="Tienda">
+        <h4>Tienda</h4>
+        <a href="tienda.html">Catálogo completo</a>
+        <a href="tienda.html#protecciones">Protecciones</a>
+        <a href="index.html#tallas">Guía de tallas</a>
+      </nav>
+      <nav aria-label="Ayuda">
+        <h4>Ayuda</h4>
+        <a href="#">Envíos y plazos</a>
+        <a href="#">Cambios y devoluciones</a>
+        <a href="#">Preguntas frecuentes</a>
+      </nav>
+      <nav aria-label="Contacto">
+        <h4>Contacto</h4>
+        <a href="mailto:contacto@kostore.cl">contacto@kostore.cl</a>
+        <a href="#">Instagram</a>
+        <a href="#">WhatsApp</a>
+      </nav>
+    </div>
+    <div class="wrap footer-bottom">
+      <p class="muted">© <span id="year">2026</span> KO Store</p>
+    </div>
+  </footer>
+
+  <script src="catalogo.js"></script>
+  <script src="cart.js"></script>
+  <script src="tienda.js"></script>
+</body>
+</html>

@@ -20,16 +20,17 @@
         <img src="recursosgraficos/kostore-web.webp" alt="KO Store" width="148" height="48">
       </a>
       <nav class="nav" aria-label="Principal">
+        <a href="tienda.html" class="nav-keep">Tienda</a>
         <a href="#categorias">Categorías</a>
         <a href="#doboks">Doboks</a>
         <a href="#destacados">Destacados</a>
         <a href="#tallas">Guía de tallas</a>
         <a href="#clubes">Clubes</a>
       </nav>
-      <a href="#" class="cart" aria-label="Carro de compras, 0 productos">
+      <button type="button" class="cart" aria-label="Abrir carro, 0 productos">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 4h2l2.4 11h11.2L21 7H6.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="9" cy="19.5" r="1.4" fill="currentColor"/><circle cx="17" cy="19.5" r="1.4" fill="currentColor"/></svg>
         <span class="cart-count">0</span>
-      </a>
+      </button>
     </div>
   </header>
 
@@ -40,7 +41,7 @@
           <h1>Equipamiento de taekwondo WT, para entrenar y para competir.</h1>
           <p class="lead">Doboks, protecciones, sistemas electrónicos y material de entrenamiento. Elegido por practicantes, para practicantes. Despachamos a todo Chile.</p>
           <div class="actions">
-            <a href="#categorias" class="btn btn-primary">Ver catálogo</a>
+            <a href="tienda.html" class="btn btn-primary">Ver catálogo</a>
             <a href="#clubes" class="btn btn-ghost">Cotizar para mi club</a>
           </div>
         </div>
@@ -79,12 +80,12 @@
           <p>Todo lo que se usa en un dojang, organizado como lo buscas.</p>
         </div>
         <ul class="cat-list">
-          <li><a href="#"><span class="cat-name">Doboks</span><span class="cat-desc">Uniformes para combate y poomsae, cuello blanco, negro y poom.</span><span class="cat-count">48 productos</span></a></li>
-          <li><a href="#"><span class="cat-name">Protecciones</span><span class="cat-desc">Petos, cabezales, antebrazos, canilleras, bucales y coquillas.</span><span class="cat-count">62 productos</span></a></li>
-          <li><a href="#"><span class="cat-name">Sistemas electrónicos</span><span class="cat-desc">Petos y cabezales electrónicos, empeineras con sensores y repuestos.</span><span class="cat-count">21 productos</span></a></li>
-          <li><a href="#"><span class="cat-name">Entrenamiento</span><span class="cat-desc">Paos, escudos, sacos de pie, conos y escaleras de coordinación.</span><span class="cat-count">35 productos</span></a></li>
-          <li><a href="#"><span class="cat-name">Cinturones</span><span class="cat-desc">De color, poom y dan, con bordado personalizado a pedido.</span><span class="cat-count">19 productos</span></a></li>
-          <li><a href="#"><span class="cat-name">Bolsos y accesorios</span><span class="cat-desc">Bolsos de equipo, cintas, vendas y elementos de primeros auxilios.</span><span class="cat-count">27 productos</span></a></li>
+          <li><a href="tienda.html#doboks"><span class="cat-name">Doboks</span><span class="cat-desc">Uniformes para combate y poomsae, cuello blanco, negro y poom.</span><span class="cat-count" data-cat="doboks"></span></a></li>
+          <li><a href="tienda.html#protecciones"><span class="cat-name">Protecciones</span><span class="cat-desc">Pecheras, cabezales, antebraceras, canilleras, bucales y coquillas.</span><span class="cat-count" data-cat="protecciones"></span></a></li>
+          <li><a href="tienda.html#electronicos"><span class="cat-name">Sistemas electrónicos</span><span class="cat-desc">Petos y cabezales electrónicos, empeineras con sensores y repuestos.</span><span class="cat-count" data-cat="electronicos"></span></a></li>
+          <li><a href="tienda.html#entrenamiento"><span class="cat-name">Entrenamiento</span><span class="cat-desc">Paos, escudos, sacos de pie, conos y escaleras de coordinación.</span><span class="cat-count" data-cat="entrenamiento"></span></a></li>
+          <li><a href="tienda.html#cinturones"><span class="cat-name">Cinturones</span><span class="cat-desc">De color, poom y dan, con bordado personalizado a pedido.</span><span class="cat-count" data-cat="cinturones"></span></a></li>
+          <li><a href="tienda.html#accesorios"><span class="cat-name">Bolsos y accesorios</span><span class="cat-desc">Bolsos de equipo, cintas, vendas y elementos de primeros auxilios.</span><span class="cat-count" data-cat="accesorios"></span></a></li>
         </ul>
       </div>
     </section>
@@ -108,7 +109,7 @@
                 <li>Cuello en V blanco o negro</li>
                 <li>Tallas 110 a 200</li>
               </ul>
-              <a href="#" class="btn btn-primary">Ver doboks de combate</a>
+              <a href="tienda.html#doboks" class="btn btn-primary">Ver doboks de combate</a>
             </div>
           </article>
           <article class="dobok-type">
@@ -123,7 +124,7 @@
                 <li>Cuello negro para dan</li>
                 <li>Tallas 130 a 200</li>
               </ul>
-              <a href="#" class="btn btn-primary">Ver doboks de poomsae</a>
+              <a href="tienda.html#doboks" class="btn btn-primary">Ver doboks de poomsae</a>
             </div>
           </article>
         </div>
@@ -146,7 +147,7 @@
             <h3>Dobok de combate Fighter</h3>
             <p class="spec">Tela ripstop liviana, cuello en V. Tallas 110 a 200.</p>
             <p class="price">$34.990</p>
-            <button class="btn btn-add" type="button">Agregar al carro</button>
+            <button class="btn btn-add" type="button" data-id="dobok-fighter">Agregar al carro</button>
           </article>
           <article class="product">
             <div class="ph ph-photo">
@@ -156,15 +157,17 @@
             <h3>Dobok de poomsae Dan</h3>
             <p class="spec">Tela pesada con caída firme, cuello negro.</p>
             <p class="price">$49.990</p>
-            <button class="btn btn-add" type="button">Agregar al carro</button>
+            <button class="btn btn-add" type="button" data-id="dobok-poomsae-dan">Agregar al carro</button>
           </article>
           <article class="product">
-            <div class="ph" role="img" aria-label="Foto del producto: peto reversible"><span>Peto</span></div>
+            <div class="ph ph-photo">
+              <img src="recursosgraficos/pechera.webp" alt="Pechera reversible Pro, lado rojo" width="474" height="474" loading="lazy">
+            </div>
             <p class="tag">Reversible chung / hong</p>
-            <h3>Peto reversible Pro</h3>
+            <h3>Pechera reversible Pro</h3>
             <p class="spec">Espuma de alta densidad, tallas 0 a 5.</p>
             <p class="price">$29.990</p>
-            <button class="btn btn-add" type="button">Agregar al carro</button>
+            <button class="btn btn-add" type="button" data-id="pechera-pro">Agregar al carro</button>
           </article>
           <article class="product">
             <div class="ph" role="img" aria-label="Foto del producto: pao doble"><span>Pao</span></div>
@@ -172,7 +175,7 @@
             <h3>Pao doble de velocidad</h3>
             <p class="spec">Sonido seco al impacto, mango reforzado.</p>
             <p class="price">$12.990</p>
-            <button class="btn btn-add" type="button">Agregar al carro</button>
+            <button class="btn btn-add" type="button" data-id="pao-doble">Agregar al carro</button>
           </article>
         </div>
       </div>
@@ -231,7 +234,7 @@
       </div>
       <nav aria-label="Tienda">
         <h4>Tienda</h4>
-        <a href="#categorias">Categorías</a>
+        <a href="tienda.html">Catálogo completo</a>
         <a href="#destacados">Más vendidos</a>
         <a href="#tallas">Guía de tallas</a>
       </nav>
@@ -253,6 +256,8 @@
     </div>
   </footer>
 
+  <script src="catalogo.js"></script>
+  <script src="cart.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

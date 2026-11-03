@@ -3,22 +3,15 @@
 // Año del footer
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// Carro (contador simple, sin backend)
-const cartCount = document.querySelector('.cart-count');
-const cartLink = document.querySelector('.cart');
-let items = 0;
-document.querySelectorAll('.btn-add').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    items += 1;
-    cartCount.textContent = items;
-    cartLink.setAttribute('aria-label', `Carro de compras, ${items} producto${items === 1 ? '' : 's'}`);
-    btn.textContent = 'Agregado';
-    btn.classList.add('added');
-    setTimeout(() => {
-      btn.textContent = 'Agregar al carro';
-      btn.classList.remove('added');
-    }, 1600);
-  });
+// Agregar al carro desde "Más vendidos": abre el carro para elegir la talla ahí
+document.querySelectorAll('.btn-add[data-id]').forEach((btn) => {
+  btn.addEventListener('click', () => window.KOCart.add(btn.dataset.id, null, { openDrawer: true }));
+});
+
+// Cantidad real de productos por categoría, tomada del catálogo
+document.querySelectorAll('.cat-count[data-cat]').forEach((el) => {
+  const n = window.KO_CATALOG.filter((p) => p.cat === el.dataset.cat).length;
+  el.textContent = `${n} producto${n === 1 ? '' : 's'}`;
 });
 
 // Calculadora de talla de dobok (por estatura, tramos de 10 cm)
