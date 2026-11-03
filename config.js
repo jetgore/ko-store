@@ -8,6 +8,9 @@ window.KO_CONFIG = {
   email: 'contacto@kostore.cl',
   whatsapp: '',
   instagram: '',
+  // Repositorio donde el panel (admin.html) guarda los productos y las fotos
+  repo: 'jetgore/ko-store',
+  rama: 'main',
   aviso: {
     texto: 'Black Friday KO Store: viernes 27 de noviembre',
     enlace: 'tienda.html',

@@ -6,6 +6,7 @@
   const ENVIO_GRATIS = 60000;
   const fmt = (n) => '$' + n.toLocaleString('es-CL');
   const byId = (id) => window.KO_CATALOG.find((p) => p.id === id);
+  const esc = window.KOEsc;
 
   let items = load();
 
@@ -73,7 +74,7 @@
   function thumb(p) {
     return p.img
       ? `<img src="${p.img}" alt="" class="${p.fit === 'cover' ? 'cover' : ''}">`
-      : `<span>${p.short}</span>`;
+      : `<span>${esc(p.short)}</span>`;
   }
 
   function render() {
@@ -90,7 +91,7 @@
         ? `<label class="line-size">Talla
              <select data-idx="${idx}" class="${i.size ? '' : 'needs-size'}">
                <option value="">Elegir</option>
-               ${p.sizes.map((s) => `<option ${s === i.size ? 'selected' : ''}>${s}</option>`).join('')}
+               ${p.sizes.map((s) => `<option ${s === i.size ? 'selected' : ''}>${esc(s)}</option>`).join('')}
              </select>
            </label>`
         : '<span class="line-size">Talla única</span>';
@@ -98,7 +99,7 @@
         <li class="line">
           <div class="line-thumb">${thumb(p)}</div>
           <div class="line-info">
-            <p class="line-name">${p.name}</p>
+            <p class="line-name">${esc(p.name)}</p>
             ${sizeCtl}
             <div class="line-qty">
               <button type="button" data-act="dec" data-idx="${idx}" aria-label="Quitar una unidad">−</button>

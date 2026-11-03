@@ -3,7 +3,6 @@
 (function () {
   const CATS = window.KO_CATEGORIES;
   const ALL = window.KO_CATALOG;
-  const fmt = window.KOCart.format;
 
   const grid = document.getElementById('grid');
   const chips = document.getElementById('chips');
@@ -51,39 +50,7 @@
   // ---------- Tarjetas ----------
   const norm = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
-  function card(p) {
-    const label = p.etiqueta
-      ? `<span class="badge badge-${p.etiqueta}">${p.etiqueta === 'oferta' ? 'Oferta' : 'Nuevo'}</span>` : '';
-    const price = p.oldPrice
-      ? `<p class="price on-sale">${fmt(p.price)}<s class="price-old">${fmt(p.oldPrice)}</s></p>`
-      : `<p class="price">${fmt(p.price)}</p>`;
-    const media = p.img
-      ? `<div class="ph ph-photo${p.img2 ? ' ph-swap' : ''}">${label}
-           <img src="${p.img}" alt="${p.name}" class="${p.fit === 'cover' ? 'cover' : ''}" loading="lazy">
-           ${p.img2 ? `<img src="${p.img2}" alt="" aria-hidden="true" loading="lazy">` : ''}
-         </div>`
-      : `<div class="ph" role="img" aria-label="${p.name}, foto pendiente">${label}<span>${p.short}</span></div>`;
-    const size = p.sizes.length
-      ? `<div class="pick-size">
-           <label for="size-${p.id}">Talla</label>
-           <select id="size-${p.id}">
-             <option value="">Elegir talla</option>
-             ${p.sizes.map((s) => `<option>${s}</option>`).join('')}
-           </select>
-         </div>`
-      : '<p class="pick-size one">Talla única</p>';
-    return `
-      <article class="product" data-id="${p.id}">
-        ${media}
-        <p class="tag${p.badge ? ' tag-wt' : ''}">${p.badge || CATS[p.cat]}</p>
-        <h3>${p.name}</h3>
-        <p class="spec">${p.spec}</p>
-        ${price}
-        ${size}
-        <p class="size-error" aria-live="polite"></p>
-        <button class="btn btn-add" type="button">Agregar al carro</button>
-      </article>`;
-  }
+  const card = (p) => window.KOProductCard(p);
 
   function render() {
     chips.querySelectorAll('.chip').forEach((c) =>

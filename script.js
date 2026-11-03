@@ -3,9 +3,15 @@
 // Año del footer
 document.getElementById('year').textContent = new Date().getFullYear();
 
+// "Más vendidos": productos marcados como destacados en el panel (máximo 4)
+const destacadosGrid = document.getElementById('destacadosGrid');
+destacadosGrid.innerHTML = window.KO_CATALOG.filter((p) => p.destacado).slice(0, 4)
+  .map((p) => window.KOProductCard(p, { pickSize: false })).join('');
+
 // Agregar al carro desde "Más vendidos": abre el carro para elegir la talla ahí
-document.querySelectorAll('.btn-add[data-id]').forEach((btn) => {
-  btn.addEventListener('click', () => window.KOCart.add(btn.dataset.id, null, { openDrawer: true }));
+destacadosGrid.addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn-add');
+  if (btn) window.KOCart.add(btn.closest('.product').dataset.id, null, { openDrawer: true });
 });
 
 // Cantidad real de productos por categoría, tomada del catálogo

@@ -53,4 +53,49 @@
   }
 
   window.KOContact = { waLink };
+
+  // Texto de productos escapado antes de insertarlo como HTML
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  window.KOEsc = esc;
+
+  // Tarjeta de producto compartida por la tienda y "Más vendidos".
+  // pickSize: false deja solo el botón (la talla se elige en el carro)
+  window.KOProductCard = function (p, { pickSize = true } = {}) {
+    const fmt = window.KOCart.format;
+    const label = p.etiqueta
+      ? `<span class="badge badge-${esc(p.etiqueta)}">${p.etiqueta === 'oferta' ? 'Oferta' : 'Nuevo'}</span>` : '';
+    const price = p.oldPrice
+      ? `<p class="price on-sale">${fmt(p.price)}<s class="price-old">${fmt(p.oldPrice)}</s></p>`
+      : `<p class="price">${fmt(p.price)}</p>`;
+    const media = p.img
+      ? `<div class="ph ph-photo${p.img2 ? ' ph-swap' : ''}">${label}
+           <img src="${esc(p.img)}" alt="${esc(p.name)}" class="${p.fit === 'cover' ? 'cover' : ''}" loading="lazy">
+           ${p.img2 ? `<img src="${esc(p.img2)}" alt="" aria-hidden="true" loading="lazy">` : ''}
+         </div>`
+      : `<div class="ph" role="img" aria-label="${esc(p.name)}, foto pendiente">${label}<span>${esc(p.short)}</span></div>`;
+    let size = '';
+    if (pickSize) {
+      size = p.sizes.length
+        ? `<div class="pick-size">
+             <label for="size-${esc(p.id)}">Talla</label>
+             <select id="size-${esc(p.id)}">
+               <option value="">Elegir talla</option>
+               ${p.sizes.map((s) => `<option>${esc(s)}</option>`).join('')}
+             </select>
+           </div>`
+        : '<p class="pick-size one">Talla única</p>';
+      size += '<p class="size-error" aria-live="polite"></p>';
+    }
+    return `
+      <article class="product" data-id="${esc(p.id)}">
+        ${media}
+        <p class="tag${p.badge ? ' tag-wt' : ''}">${esc(p.badge || window.KO_CATEGORIES[p.cat])}</p>
+        <h3>${esc(p.name)}</h3>
+        <p class="spec">${esc(p.spec)}</p>
+        ${price}
+        ${size}
+        <button class="btn btn-add" type="button">Agregar al carro</button>
+      </article>`;
+  };
 })();

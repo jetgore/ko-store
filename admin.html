@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Panel de productos — KO Store</title>
+  <link rel="icon" type="image/png" href="recursosgraficos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin">
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a href="index.html" class="logo" aria-label="Ir al sitio">
+        <img src="recursosgraficos/kostore-web.webp" alt="KO Store" width="131" height="48">
+      </a>
+      <p class="admin-title">Panel de productos</p>
+      <button type="button" class="admin-logout" id="logout" hidden>Salir</button>
+    </div>
+  </header>
+
+  <main class="wrap admin-main">
+    <!-- Acceso -->
+    <section id="login" class="admin-card login" hidden>
+      <h1>Entrar al panel</h1>
+      <p>El panel guarda los cambios en tu repositorio de GitHub y Vercel actualiza el sitio solo. Para entrar necesitas un <strong>token de GitHub</strong> con permiso para escribir en el repositorio <code id="repoName"></code>.</p>
+      <details class="help-token">
+        <summary>Cómo crear el token (una sola vez)</summary>
+        <ol>
+          <li>Entra a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub → Settings → Fine-grained tokens</a>.</li>
+          <li>En <em>Repository access</em> elige <em>Only select repositories</em> y marca solo <code id="repoName2"></code>.</li>
+          <li>En <em>Permissions → Repository permissions</em>, pon <em>Contents</em> en <em>Read and write</em>.</li>
+          <li>Crea el token, cópialo y pégalo aquí.</li>
+        </ol>
+      </details>
+      <form id="loginForm" class="login-form">
+        <label for="token">Token de GitHub</label>
+        <input id="token" type="password" autocomplete="off" required>
+        <label class="check"><input type="checkbox" id="remember"> Recordarme en este equipo</label>
+        <button type="submit" class="btn btn-primary">Entrar</button>
+        <p class="form-msg" id="loginMsg" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <!-- Lista de productos -->
+    <section id="panel" hidden>
+      <div class="admin-toolbar">
+        <div>
+          <h1>Productos</h1>
+          <p class="admin-sub" id="summary"></p>
+        </div>
+        <div class="admin-actions">
+          <div class="search">
+            <label for="filter" class="visually-hidden">Buscar productos</label>
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="filter" type="search" placeholder="Buscar producto…" autocomplete="off">
+          </div>
+          <button type="button" class="btn btn-primary" id="addBtn">Agregar producto</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th scope="col">Foto</th>
+              <th scope="col">Producto</th>
+              <th scope="col">Precio</th>
+              <th scope="col">Visible</th>
+              <th scope="col">Destacado</th>
+              <th scope="col"><span class="visually-hidden">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Barra para publicar -->
+  <div class="publish-bar" id="publishBar" hidden>
+    <div class="wrap publish-inner">
+      <p id="pendingText"></p>
+      <div class="publish-btns">
+        <button type="button" class="btn btn-ghost-light" id="discardBtn">Descartar</button>
+        <button type="button" class="btn btn-light" id="publishBtn">Publicar cambios</button>
+      </div>
+    </div>
+  </div>
+  <p class="toast" id="toast" role="status" aria-live="polite" hidden></p>
+
+  <!-- Editor de producto -->
+  <dialog id="editor" class="editor" aria-labelledby="editorTitle">
+    <form id="editForm" method="dialog" novalidate>
+      <div class="editor-head">
+        <h2 id="editorTitle">Producto</h2>
+        <button type="button" class="drawer-close" id="closeEditor" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="editor-body">
+        <div class="field">
+          <label for="f-name">Nombre</label>
+          <input id="f-name" required>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="f-cat">Categoría</label>
+            <select id="f-cat"></select>
+          </div>
+          <div class="field">
+            <label for="f-id">Código (en la URL y el carro)</label>
+            <input id="f-id" pattern="[a-z0-9-]+" required>
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="f-price">Precio (CLP)</label>
+            <input id="f-price" type="number" inputmode="numeric" min="0" step="10" required>
+          </div>
+          <div class="field">
+            <label for="f-old">Precio anterior (opcional, se muestra tachado)</label>
+            <input id="f-old" type="number" inputmode="numeric" min="0" step="10">
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-spec">Descripción corta</label>
+          <textarea id="f-spec" rows="2"></textarea>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="f-etiqueta">Etiqueta sobre la foto</label>
+            <select id="f-etiqueta">
+              <option value="">Ninguna</option>
+              <option value="nuevo">Nuevo</option>
+              <option value="oferta">Oferta</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-badge">Texto destacado (ej: Aprobado WT)</label>
+            <input id="f-badge">
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-sizes">Tallas, separadas por coma (vacío = talla única)</label>
+          <input id="f-sizes" placeholder="Ej: S, M, L">
+          <div class="presets" id="presets"></div>
+        </div>
+
+        <fieldset class="photos">
+          <legend>Fotos</legend>
+          <div class="photo-slot" data-slot="img">
+            <div class="photo-prev"></div>
+            <div>
+              <p class="photo-label">Foto principal</p>
+              <label class="btn btn-ghost btn-sm">Subir foto<input type="file" accept="image/*" hidden></label>
+              <button type="button" class="link-btn photo-remove">Quitar</button>
+            </div>
+          </div>
+          <div class="photo-slot" data-slot="img2">
+            <div class="photo-prev"></div>
+            <div>
+              <p class="photo-label">Segunda foto (al pasar el mouse)</p>
+              <label class="btn btn-ghost btn-sm">Subir foto<input type="file" accept="image/*" hidden></label>
+              <button type="button" class="link-btn photo-remove">Quitar</button>
+            </div>
+          </div>
+          <label class="check"><input type="checkbox" id="f-cover"> La foto es un primer plano: que llene todo el recuadro</label>
+        </fieldset>
+
+        <div class="checks">
+          <label class="check"><input type="checkbox" id="f-activo"> Visible en la tienda</label>
+          <label class="check"><input type="checkbox" id="f-destacado"> Destacado en la portada (máximo 4)</label>
+        </div>
+        <p class="form-msg error" id="editMsg" aria-live="polite"></p>
+      </div>
+      <div class="editor-foot">
+        <button type="button" class="btn btn-ghost" id="cancelEdit">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar producto</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="config.js"></script>
+  <script src="catalogo.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
