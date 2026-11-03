@@ -4,6 +4,8 @@
 // img2: segunda foto que aparece al pasar el mouse (opcional)
 // fit: "cover" si la foto es un primer plano que debe llenar el recuadro
 // sizes: lista de tallas; deja [] si es talla única
+// etiqueta: 'nuevo' u 'oferta' para mostrar un distintivo sobre la foto (opcional)
+// oldPrice: precio anterior, se muestra tachado junto al precio actual (opcional)
 
 window.KO_CATEGORIES = {
   doboks: 'Doboks',

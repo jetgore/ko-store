@@ -19,14 +19,18 @@
       <a href="#" class="logo" aria-label="KO Store, inicio">
         <img src="recursosgraficos/kostore-web.webp" alt="KO Store" width="131" height="48">
       </a>
-      <nav class="nav" aria-label="Principal">
-        <a href="tienda.html" class="nav-keep">Tienda</a>
+      <nav class="nav" id="nav" aria-label="Principal">
+        <a href="tienda.html">Tienda</a>
         <a href="#categorias">Categorías</a>
         <a href="#doboks">Doboks</a>
         <a href="#destacados">Destacados</a>
         <a href="#tallas">Guía de tallas</a>
         <a href="#clubes">Clubes</a>
+        <a href="ayuda.html">Ayuda</a>
       </nav>
+      <button type="button" class="menu-toggle" aria-controls="nav" aria-expanded="false" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
       <button type="button" class="cart" aria-label="Abrir carro, 0 productos">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 4h2l2.4 11h11.2L21 7H6.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="9" cy="19.5" r="1.4" fill="currentColor"/><circle cx="17" cy="19.5" r="1.4" fill="currentColor"/></svg>
         <span class="cart-count">0</span>
@@ -38,7 +42,7 @@
     <section class="hero">
       <div class="wrap hero-grid">
         <div class="hero-copy">
-          <h1>Equipamiento de taekwondo WT, para entrenar y para competir.</h1>
+          <h1>Equipamiento de taekwondo WT, para <span class="chung">entrenar</span> y para <span class="hong">competir</span>.</h1>
           <p class="lead">Doboks, protecciones, sistemas electrónicos y material de entrenamiento. Elegido por practicantes, para practicantes. Despachamos a todo Chile.</p>
           <div class="actions">
             <a href="tienda.html" class="btn btn-primary">Ver catálogo</a>
@@ -161,12 +165,14 @@
             <button class="btn btn-add" type="button" data-id="pechera-pro">Agregar al carro</button>
           </article>
           <article class="product">
-            <div class="ph" role="img" aria-label="Foto del producto: pao doble"><span>Pao</span></div>
-            <p class="tag">Entrenamiento</p>
-            <h3>Pao doble de velocidad</h3>
-            <p class="spec">Sonido seco al impacto, mango reforzado.</p>
-            <p class="price">$12.990</p>
-            <button class="btn btn-add" type="button" data-id="pao-doble">Agregar al carro</button>
+            <div class="ph ph-photo">
+              <img class="cover" src="recursosgraficos/antebrazo.webp" alt="Antebraceras Competition" loading="lazy">
+            </div>
+            <p class="tag">Protecciones</p>
+            <h3>Antebraceras Competition</h3>
+            <p class="spec">Espuma moldeada y cierre de velcro doble.</p>
+            <p class="price">$14.990</p>
+            <button class="btn btn-add" type="button" data-id="antebraceras">Agregar al carro</button>
           </article>
         </div>
       </div>
@@ -231,15 +237,15 @@
       </nav>
       <nav aria-label="Ayuda">
         <h4>Ayuda</h4>
-        <a href="#">Envíos y plazos</a>
-        <a href="#">Cambios y devoluciones</a>
-        <a href="#">Preguntas frecuentes</a>
+        <a href="ayuda.html#envios">Envíos y plazos</a>
+        <a href="ayuda.html#cambios">Cambios y devoluciones</a>
+        <a href="ayuda.html#preguntas">Preguntas frecuentes</a>
       </nav>
       <nav aria-label="Contacto">
         <h4>Contacto</h4>
         <a href="mailto:contacto@kostore.cl">contacto@kostore.cl</a>
-        <a href="#">Instagram</a>
-        <a href="#">WhatsApp</a>
+        <a href="#" data-link="instagram">Instagram</a>
+        <a href="#" data-link="whatsapp">WhatsApp</a>
       </nav>
     </div>
     <div class="wrap footer-bottom">
@@ -247,8 +253,10 @@
     </div>
   </footer>
 
+  <script src="config.js"></script>
   <script src="catalogo.js"></script>
   <script src="cart.js"></script>
+  <script src="comun.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

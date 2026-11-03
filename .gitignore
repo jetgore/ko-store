@@ -6,3 +6,6 @@ Thumbs.db
 recursosgraficos/fondo.png
 recursosgraficos/kostore.png
 /*.png
+
+# Configuración local de Claude Code
+.claude/

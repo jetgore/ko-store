@@ -33,19 +33,23 @@ sizeForm.addEventListener('submit', (e) => {
   sizeResult.innerHTML = `<span class="size-big">${size}</span>Para ${h} cm te recomendamos talla ${size}.${note}`;
 });
 
-// Formulario de clubes (validación simple; conectar a backend o servicio de formularios)
+// Formulario de clubes: abre el correo del visitante con la cotización ya redactada
+// (sin servidor; para recibirlo directo en tu bandeja, conectar a un servicio de formularios)
 const clubForm = document.getElementById('clubForm');
 const clubMsg = document.getElementById('clubMsg');
 clubForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const club = clubForm.club.value.trim();
   const email = clubForm.email.value.trim();
+  const need = clubForm.need.value.trim();
   clubMsg.classList.remove('error');
   if (!club || !/^\S+@\S+\.\S+$/.test(email)) {
     clubMsg.textContent = 'Completa el nombre del club y un correo válido.';
     clubMsg.classList.add('error');
     return;
   }
-  clubMsg.textContent = `Solicitud enviada. Te escribiremos a ${email} en menos de 24 horas hábiles.`;
-  clubForm.reset();
+  const subject = `Cotización para club: ${club}`;
+  const body = `Club o academia: ${club}\nCorreo de contacto: ${email}\n\nLo que necesitamos:\n${need || '(sin detalle)'}`;
+  location.href = `mailto:${window.KO_CONFIG.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  clubMsg.textContent = `Se abrió tu correo con la cotización lista. Envíala y te responderemos a ${email} en menos de 24 horas hábiles.`;
 });

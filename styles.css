@@ -515,9 +515,79 @@ select.needs-size { border-color: var(--hong); }
 .drawer-msg.error { color: var(--hong); }
 
 @media (max-width: 760px) {
-  .nav { display: flex; margin-left: auto; }
-  .nav a:not(.nav-keep) { display: none; }
   .toolbar-controls { flex-direction: column; align-items: stretch; }
   .search { max-width: none; flex-basis: auto; }
   .sort select { flex: 1; }
+}
+
+/* =========================================================
+   Aviso, menú móvil, WhatsApp, ayuda y etiquetas
+   ========================================================= */
+/* Franja azul/rojo bajo el header: los colores chung y hong del taekwondo */
+.site-header::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+  background: linear-gradient(to right, var(--chung) 50%, var(--hong) 50%);
+}
+.hero h1 .chung { color: var(--chung); }
+.hero h1 .hong { color: var(--hong); }
+
+.promo-bar { background: var(--hong); color: var(--paper); text-align: center; font-size: .9rem; font-weight: 600; }
+.promo-bar p { padding: 9px 0; }
+.promo-bar a { margin-left: 8px; text-underline-offset: 3px; }
+.promo-bar :focus-visible { outline-color: var(--paper); }
+
+/* Menú móvil: escondido en escritorio */
+.menu-toggle {
+  display: none; margin-left: auto; padding: 6px;
+  background: none; border: 0; color: var(--paper); cursor: pointer;
+}
+@media (max-width: 760px) {
+  .menu-toggle { display: inline-flex; }
+  .header-inner { gap: 12px; }
+  .nav {
+    display: none;
+    position: absolute; top: 100%; left: 0; right: 0;
+    flex-direction: column; gap: 0;
+    background: var(--black); border-top: 1px solid #262A31;
+    padding: 8px var(--gutter) 16px;
+  }
+  .menu-open .nav { display: flex; }
+  .nav a { padding: 14px 0; font-size: 1.05rem; border-bottom: 1px solid #262A31; }
+  .nav a[aria-current="page"] { text-decoration: none; }
+}
+
+/* Botón flotante de WhatsApp */
+.wa-float {
+  position: fixed; right: 20px; bottom: 20px; z-index: 80;
+  width: 56px; height: 56px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: #25D366; color: var(--paper);
+  box-shadow: 0 4px 14px rgba(0,0,0,.25);
+  transition: transform .15s;
+}
+.wa-float:hover { transform: scale(1.06); }
+.drawer-open .wa-float { display: none; }
+
+/* Etiquetas sobre la foto y precio de oferta */
+.ph { position: relative; }
+.badge {
+  position: absolute; top: 10px; left: 10px; z-index: 1;
+  padding: 3px 10px; border-radius: 12px;
+  font-size: .75rem; font-weight: 700; letter-spacing: .02em; text-transform: uppercase;
+  color: var(--paper); background: var(--chung);
+}
+.badge-oferta { background: var(--hong); }
+.price-old { margin-left: 8px; font-weight: 500; font-size: .95rem; color: var(--ink-soft); text-decoration: line-through; }
+.price.on-sale { color: var(--hong); }
+
+/* Página de ayuda */
+.help { padding: clamp(40px, 6vw, 64px) 0; border-top: 1px solid var(--line); }
+.help-grid { display: grid; grid-template-columns: 1fr 2fr; gap: clamp(20px, 5vw, 64px); }
+.help-body { display: grid; gap: 14px; color: var(--ink-soft); max-width: 62ch; }
+.help-body a { color: var(--chung); }
+.faq details { border-bottom: 1px solid var(--line); padding: 4px 0 14px; }
+.faq summary { cursor: pointer; font-weight: 650; color: var(--ink); padding: 10px 0 4px; }
+.faq details p { margin-top: 8px; }
+@media (max-width: 760px) {
+  .help-grid { grid-template-columns: 1fr; }
 }

@@ -42,7 +42,7 @@
     <div class="drawer-foot">
       <div class="drawer-total"><span>Subtotal</span><strong class="drawer-subtotal">$0</strong></div>
       <p class="drawer-ship"></p>
-      <button type="button" class="btn btn-primary drawer-pay">Ir a pagar</button>
+      <button type="button" class="btn btn-primary drawer-pay">Enviar pedido</button>
       <p class="drawer-msg" aria-live="polite"></p>
     </div>`;
   document.body.append(overlay, drawer);
@@ -150,7 +150,21 @@
       msg.textContent = `Elige la talla de "${byId(missing.id).name}" antes de pagar.`;
       return;
     }
-    msg.textContent = 'El pago en línea todavía no está habilitado. Para cerrar tu compra escríbenos a contacto@kostore.cl con este pedido.';
+    // Sin pago en línea todavía: el pedido se envía armado por WhatsApp o, si no hay número, por correo
+    const cfg = window.KO_CONFIG;
+    const lines = items.map((i) => {
+      const p = byId(i.id);
+      return `- ${i.qty} x ${p.name}${i.size ? ` (talla ${i.size})` : ''}: ${fmt(p.price * i.qty)}`;
+    });
+    const subtotal = items.reduce((s, i) => s + byId(i.id).price * i.qty, 0);
+    const text = `Hola KO Store, quiero hacer este pedido:\n${lines.join('\n')}\nSubtotal: ${fmt(subtotal)}`;
+    if (cfg.whatsapp) {
+      window.open(window.KOContact.waLink(text), '_blank', 'noopener');
+      msg.textContent = 'Abrimos WhatsApp con tu pedido listo. Envíalo y te confirmamos el pago y el despacho.';
+    } else {
+      location.href = `mailto:${cfg.email}?subject=${encodeURIComponent('Pedido KO Store')}&body=${encodeURIComponent(text)}`;
+      msg.textContent = `Abrimos tu correo con el pedido listo. Envíalo a ${cfg.email} y te confirmamos el pago y el despacho.`;
+    }
   });
 
   // ---------- API pública ----------
