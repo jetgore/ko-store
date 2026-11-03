@@ -60,7 +60,7 @@ p { margin: 0; }
   height: 80px; gap: 24px;
 }
 .logo { display: inline-flex; align-items: center; text-decoration: none; }
-.logo img { height: 56px; width: auto; }
+.logo img { height: 64px; width: auto; }
 section[id] { scroll-margin-top: 80px; }
 .nav { display: flex; gap: 32px; }
 .nav a {
