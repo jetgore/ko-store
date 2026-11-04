@@ -49,6 +49,7 @@
     <nav class="admin-tabs" id="tabs" aria-label="Secciones del panel" hidden>
       <button type="button" data-tab="panel" aria-current="page">Productos</button>
       <button type="button" data-tab="comentarios">Comentarios <span class="tab-count" id="comCount" hidden></span></button>
+      <button type="button" data-tab="importacion">Importación</button>
     </nav>
 
     <!-- Lista de productos -->
@@ -101,6 +102,99 @@
       <ul class="com-list" id="comPendientes"></ul>
       <h2 class="com-h">Publicados en la web</h2>
       <ul class="com-list" id="comPublicados"></ul>
+    </section>
+
+    <!-- Simulador de importación: solo calcula en este navegador, no publica nada (importacion.js) -->
+    <section id="importacion" hidden>
+      <div class="admin-toolbar">
+        <div>
+          <h1>Simulador de importación</h1>
+          <p class="admin-sub">Costo puesto en Chile y margen por producto. Los escenarios se guardan solo en este navegador.</p>
+        </div>
+        <div class="admin-actions">
+          <label for="simEscenario" class="visually-hidden">Escenario guardado</label>
+          <select id="simEscenario" class="sim-select"></select>
+          <button type="button" class="btn btn-ghost btn-sm" id="simGuardar">Guardar como…</button>
+          <button type="button" class="link-btn danger" id="simBorrar">Borrar escenario</button>
+        </div>
+      </div>
+
+      <div class="sim-grid">
+        <fieldset class="admin-card sim-params">
+          <legend>Supuestos del pedido</legend>
+          <div class="field">
+            <label for="simProveedor">Proveedor</label>
+            <input id="simProveedor" data-param="proveedor">
+          </div>
+          <div class="row-2">
+            <div class="field">
+              <label for="simTc">Dólar (CLP por US$)</label>
+              <input id="simTc" type="number" inputmode="decimal" min="0" step="any" data-param="tc">
+            </div>
+            <div class="field">
+              <label for="simFlete">Flete internacional (US$)</label>
+              <input id="simFlete" type="number" inputmode="decimal" min="0" step="any" data-param="flete">
+            </div>
+            <div class="field">
+              <label for="simSeguro">Seguro (% del FOB)</label>
+              <input id="simSeguro" type="number" inputmode="decimal" min="0" step="any" data-param="seguro">
+            </div>
+            <div class="field">
+              <label for="simArancel">Arancel</label>
+              <select id="simArancel" data-param="arancel">
+                <option value="0">0 % (con TLC)</option>
+                <option value="6">6 % (sin TLC)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="simAgente">Agente de aduana (US$)</label>
+              <input id="simAgente" type="number" inputmode="decimal" min="0" step="any" data-param="agente">
+            </div>
+            <div class="field">
+              <label for="simBanco">Transferencia y comisiones (US$)</label>
+              <input id="simBanco" type="number" inputmode="decimal" min="0" step="any" data-param="banco">
+            </div>
+            <div class="field">
+              <label for="simLocal">Gastos en Chile (CLP)</label>
+              <input id="simLocal" type="number" inputmode="numeric" min="0" step="any" data-param="local">
+            </div>
+            <div class="field">
+              <label for="simObjetivo">Margen objetivo (%)</label>
+              <input id="simObjetivo" type="number" inputmode="decimal" min="0" max="95" step="any" data-param="objetivo">
+            </div>
+          </div>
+          <p class="sim-note">Los gastos (flete, seguro, arancel, agente, etc.) se reparten según el valor FOB de cada producto. El arancel 0 % del TLC Chile–China exige el certificado de origen del proveedor. Gastos en Chile: retiro del puerto, despacho a bodega, etc. El IVA de la importación no se suma al costo porque se recupera como crédito fiscal.</p>
+        </fieldset>
+
+        <div class="admin-card sim-resumen" aria-live="polite">
+          <h2>Resumen</h2>
+          <dl id="simResumen"></dl>
+        </div>
+      </div>
+
+      <h2 class="com-h">Productos del pedido</h2>
+      <p class="admin-sub">FOB = precio unitario del proveedor en dólares. Venta = tu precio con IVA. "Precio sugerido" es el precio con IVA que da el margen objetivo.</p>
+      <div class="table-wrap sim-wrap">
+        <table class="admin-table sim-table">
+          <thead>
+            <tr>
+              <th scope="col">Producto</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">FOB (US$)</th>
+              <th scope="col">Venta (CLP)</th>
+              <th scope="col">Costo unitario</th>
+              <th scope="col">Margen</th>
+              <th scope="col">Precio sugerido</th>
+              <th scope="col"><span class="visually-hidden">Quitar</span></th>
+            </tr>
+          </thead>
+          <tbody id="simRows"></tbody>
+        </table>
+      </div>
+      <div class="sim-foot">
+        <button type="button" class="btn btn-ghost btn-sm" id="simAgregar">Agregar producto</button>
+        <button type="button" class="link-btn" id="simReset">Volver al pedido de ejemplo</button>
+      </div>
     </section>
   </main>
 
@@ -201,5 +295,6 @@
   <script src="config.js"></script>
   <script src="catalogo.js"></script>
   <script src="admin.js"></script>
+  <script src="importacion.js"></script>
 </body>
 </html>

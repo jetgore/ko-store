@@ -15,6 +15,7 @@
 
 /* Acceso */
 .admin-card { background: var(--paper); border-radius: var(--radius); padding: clamp(24px, 4vw, 40px); }
+.login[hidden], .admin-tabs[hidden] { display: none; }
 .login { max-width: 560px; margin: 0 auto; display: grid; gap: 16px; }
 .login > p { color: var(--ink-soft); }
 .help-token { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px; font-size: .95rem; }
@@ -141,3 +142,55 @@
 .com-meta strong { color: var(--ink); }
 .com-actions { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .com-empty { color: var(--ink-soft); padding: 8px 0; }
+
+/* ---------- Simulador de importación ---------- */
+.sim-select { min-height: 38px; min-width: 200px; font-size: .9rem; }
+.sim-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
+.sim-params { margin: 0; border: 0; display: grid; gap: 16px; }
+.sim-params legend { float: left; width: 100%; font-weight: 750; font-size: 1.15rem; margin-bottom: 4px; }
+.sim-params .field label { display: block; font-size: .9rem; font-weight: 600; margin-bottom: 6px; }
+.sim-params select { width: 100%; min-height: 48px; }
+.sim-note { font-size: .85rem; color: var(--ink-soft); }
+.sim-resumen h2 { font-weight: 750; font-size: 1.15rem; margin-bottom: 12px; }
+.sim-resumen dl { margin: 0; display: grid; }
+.sim-resumen dl > div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: .95rem; }
+.sim-resumen dt { color: var(--ink-soft); }
+.sim-resumen dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.sim-resumen .sim-total { border-bottom: 1.5px solid var(--ink); }
+.sim-resumen .sim-total dt { color: var(--ink); font-weight: 650; }
+.sim-resumen .sim-total dd { font-size: 1.1rem; }
+.sim-resumen .pos dd { color: #15803D; }
+.sim-resumen .neg dd, .sim-out.neg { color: var(--hong); }
+.sim-wrap { margin-top: 16px; }
+.sim-table input { min-height: 40px; padding: 0 10px; font-size: .92rem; width: 100%; }
+.sim-table td:nth-child(1) { min-width: 200px; }
+.sim-table td:nth-child(2) { width: 90px; }
+.sim-table td:nth-child(3) { width: 100px; }
+.sim-table td:nth-child(4) { width: 120px; }
+.sim-out { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sim-out.pos { color: #15803D; }
+.sim-out.warn { color: #B45309; }
+.sim-del { text-align: right; }
+.sim-foot { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin-top: 16px; }
+
+@media (max-width: 900px) {
+  .sim-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .sim-select { flex: 1 1 100%; }
+  /* Cada producto como tarjeta */
+  .sim-wrap { background: none; overflow: visible; }
+  .sim-table thead { display: none; }
+  .sim-table, .sim-table tbody { display: block; }
+  .sim-table tr { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; background: var(--paper); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; }
+  .sim-table td, .admin-table.sim-table td { display: block; width: auto; min-width: 0; padding: 0; border: 0; }
+  .sim-table td:nth-child(1) { grid-column: 1 / -1; }
+  .sim-table td[data-label]::before { content: attr(data-label); display: block; font-size: .75rem; font-weight: 650; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .03em; margin-bottom: 4px; }
+  .sim-table .sim-del { grid-column: 1 / -1; text-align: left; }
+  .sim-table td.empty { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  /* Con tres pestañas, la barra se desliza en vez de salirse de la pantalla */
+  .admin-tabs { overflow-x: auto; scrollbar-width: none; }
+  .admin-tabs button { flex: none; padding: 10px 10px; }
+}

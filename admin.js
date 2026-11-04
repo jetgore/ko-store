@@ -214,6 +214,7 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
     $('tabs').hidden = true;
     $('panel').hidden = true;
     $('comentarios').hidden = true;
+    $('importacion').hidden = true;
     $('logout').hidden = true;
     $('publishBar').hidden = true;
     $('loginMsg').textContent = message;
@@ -615,6 +616,7 @@ window.KO_COMENTARIOS = ${JSON.stringify(list, null, 2)};
   function showTab(tab) {
     $('panel').hidden = tab !== 'panel';
     $('comentarios').hidden = tab !== 'comentarios';
+    $('importacion').hidden = tab !== 'importacion';
     $('tabs').querySelectorAll('[data-tab]').forEach((b) => {
       if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
     });
