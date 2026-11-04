@@ -54,6 +54,49 @@
 
   window.KOContact = { waLink };
 
+  // Formularios que se envían a una función de Vercel: <form data-envio="/api/...">
+  // Los campos con name se mandan como JSON. data-ok es el mensaje de éxito ({email} se reemplaza).
+  // Trampas para bots: campo oculto "sitio" y tiempo mínimo desde que se abrió la página.
+  const abierto = Date.now();
+  document.querySelectorAll('form[data-envio]').forEach((form) => {
+    const msg = form.querySelector('.form-msg');
+    const btn = form.querySelector('[type="submit"]');
+    const show = (text, isError) => {
+      msg.textContent = text;
+      msg.classList.toggle('error', isError);
+    };
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const invalid = [...form.elements].find((el) => el.name && el.name !== 'sitio' && el.willValidate
+        && (!el.checkValidity() || (el.required && !el.value.trim())));
+      if (invalid) {
+        const label = form.querySelector(`label[for="${invalid.id}"]`);
+        show(invalid.dataset.error || `Revisa el campo "${label ? label.textContent.trim() : invalid.name}".`, true);
+        invalid.focus();
+        return;
+      }
+      const data = Object.fromEntries(new FormData(form));
+      data.ms = Date.now() - abierto;
+      btn.disabled = true;
+      show('Enviando…', false);
+      try {
+        const res = await fetch(form.dataset.envio, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const out = await res.json().catch(() => ({}));
+        if (!res.ok || !out.ok) throw new Error(out.error || '');
+        form.reset();
+        show((form.dataset.ok || '¡Listo! Recibimos tu mensaje.').replace('{email}', data.email || ''), false);
+      } catch (err) {
+        show(`${err.message || 'No pudimos enviar el formulario.'} También puedes escribirnos a ${cfg.email}.`, true);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+
   // Texto de productos escapado antes de insertarlo como HTML
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);

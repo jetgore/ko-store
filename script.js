@@ -39,23 +39,30 @@ sizeForm.addEventListener('submit', (e) => {
   sizeResult.innerHTML = `<span class="size-big">${size}</span>Para ${h} cm te recomendamos talla ${size}.${note}`;
 });
 
-// Formulario de clubes: abre el correo del visitante con la cotización ya redactada
-// (sin servidor; para recibirlo directo en tu bandeja, conectar a un servicio de formularios)
-const clubForm = document.getElementById('clubForm');
-const clubMsg = document.getElementById('clubMsg');
-clubForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const club = clubForm.club.value.trim();
-  const email = clubForm.email.value.trim();
-  const need = clubForm.need.value.trim();
-  clubMsg.classList.remove('error');
-  if (!club || !/^\S+@\S+\.\S+$/.test(email)) {
-    clubMsg.textContent = 'Completa el nombre del club y un correo válido.';
-    clubMsg.classList.add('error');
-    return;
-  }
-  const subject = `Cotización para club: ${club}`;
-  const body = `Club o academia: ${club}\nCorreo de contacto: ${email}\n\nLo que necesitamos:\n${need || '(sin detalle)'}`;
-  location.href = `mailto:${window.KO_CONFIG.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  clubMsg.textContent = `Se abrió tu correo con la cotización lista. Envíala y te responderemos a ${email} en menos de 24 horas hábiles.`;
-});
+// Comentarios aprobados (comentarios.js, los publica el panel). Los más recientes primero.
+const reviewList = document.getElementById('reviewList');
+const reviewMore = document.getElementById('reviewMore');
+const REVIEWS_VISIBLES = 6;
+const reviews = [...(window.KO_COMENTARIOS || [])]
+  .sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+const fechaLarga = (f) => {
+  const d = new Date(`${f}T12:00:00`);
+  return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' });
+};
+const drawReviews = (all) => {
+  const esc = window.KOEsc;
+  const list = all ? reviews : reviews.slice(0, REVIEWS_VISIBLES);
+  reviewList.innerHTML = list.map((c) => {
+    const fecha = fechaLarga(c.fecha);
+    return `
+      <li class="review">
+        <blockquote>${esc(c.texto)}</blockquote>
+        <p class="review-meta"><strong>${esc(c.nombre)}</strong>${c.lugar ? ` · ${esc(c.lugar)}` : ''}${fecha ? ` · <time datetime="${esc(c.fecha)}">${fecha}</time>` : ''}</p>
+      </li>`;
+  }).join('') || '<li class="review review-empty">Todavía no hay comentarios publicados. ¡Sé el primero en dejar el tuyo!</li>';
+  reviewMore.hidden = all || reviews.length <= REVIEWS_VISIBLES;
+};
+drawReviews(false);
+reviewMore.addEventListener('click', () => drawReviews(true));
+
+// El formulario de clubes y el de comentarios se envían desde comun.js (form[data-envio])

@@ -59,7 +59,7 @@
         <h2>Cambios y devoluciones</h2>
         <div class="help-body">
           <p>Si la talla no te quedó, puedes cambiarla sin costo hasta 30 días después de recibir tu pedido.</p>
-          <p>Para pedir un cambio, escríbenos con tu número de pedido y la talla que necesitas.</p>
+          <p>Para pedir un cambio, <a href="#contacto">escríbenos</a> con tu número de pedido y la talla que necesitas.</p>
         </div>
       </div>
     </section>
@@ -91,6 +91,44 @@
         </div>
       </div>
     </section>
+
+    <section id="contacto" class="section help">
+      <div class="wrap help-grid">
+        <div>
+          <h2>Escríbenos</h2>
+          <p class="help-lead">¿Otra duda, un cambio o un pedido especial? Déjanos tu mensaje y te respondemos por correo.</p>
+        </div>
+        <form class="contact-form" id="contactForm" novalidate data-envio="/api/contacto"
+              data-ok="¡Gracias! Recibimos tu mensaje y te responderemos a {email}.">
+          <input type="hidden" name="tipo" value="contacto">
+          <div class="row-fields">
+            <div class="field">
+              <label for="ct-nombre">Nombre</label>
+              <input id="ct-nombre" name="nombre" type="text" autocomplete="name" maxlength="100" required>
+            </div>
+            <div class="field">
+              <label for="ct-email">Correo</label>
+              <input id="ct-email" name="email" type="email" autocomplete="email" maxlength="160" required
+                     data-error="Escribe un correo válido para poder responderte.">
+            </div>
+          </div>
+          <div class="field">
+            <label for="ct-tel">Teléfono (opcional)</label>
+            <input id="ct-tel" name="telefono" type="tel" autocomplete="tel" maxlength="30" placeholder="+56 9 1234 5678">
+          </div>
+          <div class="field">
+            <label for="ct-msg">Mensaje</label>
+            <textarea id="ct-msg" name="mensaje" rows="5" maxlength="3000" required></textarea>
+          </div>
+          <div class="hp" aria-hidden="true">
+            <label for="ct-sitio">Sitio web</label>
+            <input id="ct-sitio" name="sitio" type="text" tabindex="-1" autocomplete="off">
+          </div>
+          <button class="btn btn-primary" type="submit">Enviar mensaje</button>
+          <p class="form-msg" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
@@ -115,6 +153,7 @@
       </nav>
       <nav aria-label="Contacto">
         <h4>Contacto</h4>
+        <a href="#contacto">Formulario de contacto</a>
         <a href="mailto:contacto@kostore.cl">contacto@kostore.cl</a>
         <a href="#" data-link="instagram">Instagram</a>
         <a href="#" data-link="whatsapp">WhatsApp</a>

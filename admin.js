@@ -203,13 +203,17 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
 
   function showPanel() {
     $('login').hidden = true;
-    $('panel').hidden = false;
+    $('tabs').hidden = false;
     $('logout').hidden = false;
+    showTab('panel');
     render();
+    loadComentarios();
   }
   function showLogin(message = '') {
     $('login').hidden = false;
+    $('tabs').hidden = true;
     $('panel').hidden = true;
+    $('comentarios').hidden = true;
     $('logout').hidden = true;
     $('publishBar').hidden = true;
     $('loginMsg').textContent = message;
@@ -446,6 +450,178 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
       btn.disabled = false;
       btn.textContent = 'Publicar cambios';
     }
+  });
+
+  // ---------- Comentarios ----------
+  // La web (api/comentarios.js) crea un issue "[Comentario] Nombre" con los datos en un
+  // comentario HTML. Aprobar lo agrega a comentarios.js (un commit) y cierra el issue;
+  // rechazar solo cierra el issue.
+  const COM_FILE = 'comentarios.js';
+  const COM_PREFIX = '[Comentario]';
+  let pendientes = []; // comentarios por revisar (issues abiertos)
+  let publicados = []; // comentarios en comentarios.js
+
+  const encode = (text) => {
+    let bin = '';
+    new TextEncoder().encode(text).forEach((b) => { bin += String.fromCharCode(b); });
+    return btoa(bin);
+  };
+  const fechaCorta = (f) => {
+    const d = new Date(`${f}T12:00:00`);
+    return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+
+  function serializeComentarios(list) {
+    return `// KO Store — comentarios aprobados. Este archivo lo genera el panel de administración (admin.html).
+// Si lo editas a mano, mantén el formato JSON después de "window.KO_COMENTARIOS =".
+window.KO_COMENTARIOS = ${JSON.stringify(list, null, 2)};
+`;
+  }
+
+  // Siempre se lee la versión actual para no pisar cambios hechos desde otro equipo
+  async function readComentarios() {
+    try {
+      const file = await gh(`/contents/${COM_FILE}?ref=${encodeURIComponent(cfg.rama)}`);
+      const text = decode(file.content);
+      const start = text.indexOf('[', text.indexOf('KO_COMENTARIOS'));
+      return { sha: file.sha, list: JSON.parse(text.slice(start, text.lastIndexOf(']') + 1)) };
+    } catch (err) {
+      if (err.status === 404) return { sha: null, list: [] };
+      throw err;
+    }
+  }
+
+  function writeComentarios(list, sha, message) {
+    return gh(`/contents/${COM_FILE}`, {
+      method: 'PUT',
+      body: JSON.stringify({ message, branch: cfg.rama, content: encode(serializeComentarios(list)), ...(sha ? { sha } : {}) }),
+    });
+  }
+
+  function parseIssue(issue) {
+    const m = /<!-- ko-comentario (\{[\s\S]*?\}) -->/.exec(issue.body || '');
+    if (!m) return null;
+    try {
+      const d = JSON.parse(m[1]);
+      return {
+        issue: issue.number,
+        nombre: String(d.nombre || '').slice(0, 60),
+        lugar: String(d.lugar || '').slice(0, 60),
+        texto: String(d.texto || '').slice(0, 600),
+        fecha: String(d.fecha || issue.created_at.slice(0, 10)),
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async function loadComentarios() {
+    $('comError').textContent = '';
+    try {
+      // Solo issues creados por la cuenta dueña del repositorio (la de la función de Vercel),
+      // así nadie puede colar comentarios abriendo un issue a mano
+      const owner = cfg.repo.split('/')[0];
+      const [issues, pub] = await Promise.all([
+        gh(`/issues?state=open&creator=${encodeURIComponent(owner)}&per_page=100`),
+        readComentarios(),
+      ]);
+      publicados = pub.list;
+      const ya = new Set(publicados.map((c) => c.id));
+      pendientes = issues
+        .filter((i) => !i.pull_request && i.title.startsWith(COM_PREFIX))
+        .map(parseIssue)
+        .filter((c) => c && !ya.has(c.issue));
+    } catch (err) {
+      pendientes = [];
+      publicados = [];
+      $('comError').textContent = err.status === 403 || err.status === 404
+        ? 'Tu token no tiene permiso para ver los comentarios. Créalo de nuevo con "Issues: Read and write" (ver "Cómo crear el token" al entrar).'
+        : 'No se pudieron cargar los comentarios. Revisa tu conexión y presiona "Actualizar".';
+    }
+    renderComentarios();
+  }
+
+  const comItem = (c, pendiente) => `
+    <li class="com-item" data-id="${pendiente ? c.issue : c.id}">
+      <blockquote>${esc(c.texto)}</blockquote>
+      <p class="com-meta"><strong>${esc(c.nombre)}</strong>${c.lugar ? ` · ${esc(c.lugar)}` : ''} · ${esc(fechaCorta(c.fecha))}</p>
+      <div class="com-actions">${pendiente
+        ? `<button type="button" class="btn btn-primary btn-sm" data-com="aprobar">Aprobar y publicar</button>
+           <button type="button" class="btn btn-ghost btn-sm" data-com="rechazar">Rechazar</button>`
+        : '<button type="button" class="link-btn danger" data-com="quitar">Quitar de la web</button>'}</div>
+    </li>`;
+
+  function renderComentarios() {
+    $('comSummary').textContent = `${pendientes.length} por revisar · ${publicados.length} publicados`;
+    $('comCount').textContent = pendientes.length;
+    $('comCount').hidden = !pendientes.length;
+    $('comPendientes').innerHTML = pendientes.map((c) => comItem(c, true)).join('')
+      || '<li class="com-empty">No hay comentarios nuevos.</li>';
+    $('comPublicados').innerHTML = publicados.map((c) => comItem(c, false)).join('')
+      || '<li class="com-empty">Todavía no hay comentarios publicados.</li>';
+  }
+
+  async function aprobar(c) {
+    const { sha, list } = await readComentarios();
+    if (!list.some((x) => x.id === c.issue)) {
+      const nuevo = { id: c.issue, nombre: c.nombre, ...(c.lugar ? { lugar: c.lugar } : {}), texto: c.texto, fecha: c.fecha };
+      await writeComentarios([nuevo, ...list], sha, `Publica comentario de ${c.nombre}`);
+    }
+    await gh(`/issues/${c.issue}`, { method: 'PATCH', body: JSON.stringify({ state: 'closed', state_reason: 'completed' }) });
+  }
+
+  const rechazar = (c) => gh(`/issues/${c.issue}`, {
+    method: 'PATCH', body: JSON.stringify({ state: 'closed', state_reason: 'not_planned' }),
+  });
+
+  async function quitar(c) {
+    const { sha, list } = await readComentarios();
+    await writeComentarios(list.filter((x) => x.id !== c.id), sha, `Quita comentario de ${c.nombre}`);
+  }
+
+  $('comentarios').addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-com]');
+    if (!btn) return;
+    const id = Number(btn.closest('.com-item').dataset.id);
+    const act = btn.dataset.com;
+    const c = act === 'quitar' ? publicados.find((x) => x.id === id) : pendientes.find((x) => x.issue === id);
+    if (!c) return;
+    if (act === 'rechazar' && !confirm(`¿Rechazar el comentario de ${c.nombre}? No se publicará.`)) return;
+    if (act === 'quitar' && !confirm(`¿Quitar de la web el comentario de ${c.nombre}?`)) return;
+    const item = btn.closest('.com-item');
+    item.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+    btn.textContent = 'Guardando…';
+    try {
+      if (act === 'aprobar') await aprobar(c);
+      if (act === 'rechazar') await rechazar(c);
+      if (act === 'quitar') await quitar(c);
+      toast({
+        aprobar: 'Comentario publicado. Aparece en la web en 1 o 2 minutos.',
+        rechazar: 'Comentario rechazado. No se publicará.',
+        quitar: 'Comentario quitado. La web se actualiza en 1 o 2 minutos.',
+      }[act]);
+    } catch (err) {
+      if (err.status === 401) toast('Tu token expiró. Sal y vuelve a entrar.', true);
+      else if (err.status === 403 || err.status === 404) toast('El token no tiene permiso para esta acción (necesita Contents e Issues en Read and write).', true);
+      else if (err.status === 409 || err.status === 422) toast('Los comentarios cambiaron mientras tanto. Intenta de nuevo.', true);
+      else toast('No se pudo guardar. Revisa tu conexión e intenta de nuevo.', true);
+    }
+    await loadComentarios();
+  });
+
+  $('comReload').addEventListener('click', loadComentarios);
+
+  // ---------- Pestañas ----------
+  function showTab(tab) {
+    $('panel').hidden = tab !== 'panel';
+    $('comentarios').hidden = tab !== 'comentarios';
+    $('tabs').querySelectorAll('[data-tab]').forEach((b) => {
+      if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
+  }
+  $('tabs').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-tab]');
+    if (b) showTab(b.dataset.tab);
   });
 
   // ---------- Acceso ----------
