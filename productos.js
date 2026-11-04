@@ -2,12 +2,23 @@
 // Si lo editas a mano, mantén el formato JSON después de "window.KO_PRODUCTOS =".
 window.KO_PRODUCTOS = [
   {
+    "id": "pechera-electronica-kpnp",
+    "cat": "electronicos",
+    "name": "Pechera electronica KPNP",
+    "price": 80000,
+    "fotos": [
+      "recursosgraficos/productos/pechera-electronica-kpnp-mw1ebno2jd13.webp"
+    ],
+    "short": "Pechera",
+    "spec": "",
+    "sizes": [],
+    "activo": true
+  },
+  {
     "id": "dobok-fighter",
     "cat": "doboks",
     "name": "Dobok de combate Fighter",
     "price": 34990,
-    "img": "recursosgraficos/dobokfighter2.webp",
-    "img2": "recursosgraficos/dobokfighter3.webp",
     "short": "Fighter",
     "spec": "Tela ripstop liviana, cuello en V negro.",
     "sizes": [
@@ -24,14 +35,17 @@ window.KO_PRODUCTOS = [
     ],
     "badge": "Aprobado WT",
     "activo": true,
-    "destacado": true
+    "destacado": true,
+    "fotos": [
+      "recursosgraficos/dobokfighter2.webp",
+      "recursosgraficos/dobokfighter3.webp"
+    ]
   },
   {
     "id": "dobok-basic",
     "cat": "doboks",
     "name": "Dobok de entrenamiento Basic",
     "price": 24990,
-    "img": "recursosgraficos/dobokfighter.webp",
     "short": "Basic",
     "spec": "Algodón mezcla para el uso diario en el dojang.",
     "sizes": [
@@ -46,14 +60,16 @@ window.KO_PRODUCTOS = [
       "190",
       "200"
     ],
-    "activo": true
+    "activo": true,
+    "fotos": [
+      "recursosgraficos/dobokfighter.webp"
+    ]
   },
   {
     "id": "dobok-poomsae-dan",
     "cat": "doboks",
     "name": "Dobok de poomsae Dan",
     "price": 49990,
-    "img": "recursosgraficos/dobokpoomsae1.webp",
     "short": "Poomsae",
     "spec": "Tela pesada con caída firme, cuello negro.",
     "sizes": [
@@ -68,14 +84,16 @@ window.KO_PRODUCTOS = [
     ],
     "badge": "Aprobado WT",
     "activo": true,
-    "destacado": true
+    "destacado": true,
+    "fotos": [
+      "recursosgraficos/dobokpoomsae1.webp"
+    ]
   },
   {
     "id": "dobok-poomsae-premium",
     "cat": "doboks",
     "name": "Dobok de poomsae Premium",
     "price": 64990,
-    "img": "recursosgraficos/dobokpoomsae2.webp",
     "fit": "cover",
     "short": "Premium",
     "spec": "Tela texturizada de alto gramaje y bordado en el pecho.",
@@ -89,14 +107,16 @@ window.KO_PRODUCTOS = [
       "200"
     ],
     "badge": "Aprobado WT",
-    "activo": true
+    "activo": true,
+    "fotos": [
+      "recursosgraficos/dobokpoomsae2.webp"
+    ]
   },
   {
     "id": "pechera-pro",
     "cat": "protecciones",
     "name": "Pechera reversible Pro",
     "price": 29990,
-    "img": "recursosgraficos/pechera.webp",
     "short": "Pechera",
     "spec": "Reversible chung / hong, espuma de alta densidad.",
     "sizes": [
@@ -108,14 +128,16 @@ window.KO_PRODUCTOS = [
       "5"
     ],
     "activo": true,
-    "destacado": true
+    "destacado": true,
+    "fotos": [
+      "recursosgraficos/pechera.webp"
+    ]
   },
   {
     "id": "pechera-junior",
     "cat": "protecciones",
     "name": "Pechera reversible Junior",
     "price": 22990,
-    "img": "recursosgraficos/pechera-junior.webp",
     "short": "Pechera Jr",
     "spec": "Más liviana, pensada para niños de 5 a 12 años.",
     "sizes": [
@@ -123,14 +145,16 @@ window.KO_PRODUCTOS = [
       "1",
       "2"
     ],
-    "activo": true
+    "activo": true,
+    "fotos": [
+      "recursosgraficos/pechera-junior.webp"
+    ]
   },
   {
     "id": "antebraceras",
     "cat": "protecciones",
     "name": "Antebraceras Competition",
     "price": 14990,
-    "img": "recursosgraficos/antebrazo.webp",
     "fit": "cover",
     "short": "Antebrazo",
     "spec": "Espuma moldeada y cierre de velcro doble.",
@@ -142,14 +166,16 @@ window.KO_PRODUCTOS = [
       "XL"
     ],
     "activo": true,
-    "destacado": true
+    "destacado": true,
+    "fotos": [
+      "recursosgraficos/antebrazo.webp"
+    ]
   },
   {
     "id": "empeineras",
     "cat": "protecciones",
     "name": "Empeineras de tela",
     "price": 12990,
-    "img": "recursosgraficos/empeineras.webp",
     "short": "Empeineras",
     "spec": "Tela elástica con acolchado en el empeine.",
     "sizes": [
@@ -159,14 +185,16 @@ window.KO_PRODUCTOS = [
       "L",
       "XL"
     ],
-    "activo": true
+    "activo": true,
+    "fotos": [
+      "recursosgraficos/empeineras.webp"
+    ]
   },
   {
     "id": "canilleras",
     "cat": "protecciones",
     "name": "Canilleras de combate",
     "price": 16990,
-    "img": "recursosgraficos/canilleras-combate.webp",
     "short": "Canilleras",
     "spec": "Protección de tibia con funda elástica.",
     "sizes": [
@@ -176,14 +204,16 @@ window.KO_PRODUCTOS = [
       "L",
       "XL"
     ],
-    "activo": true
+    "activo": true,
+    "fotos": [
+      "recursosgraficos/canilleras-combate.webp"
+    ]
   },
   {
     "id": "cabezal",
     "cat": "protecciones",
     "name": "Cabezal de combate",
     "price": 27990,
-    "img": "recursosgraficos/cabezal-combate.webp",
     "short": "Cabezal",
     "spec": "Disponible en azul y rojo. Cierre ajustable.",
     "sizes": [
@@ -191,14 +221,16 @@ window.KO_PRODUCTOS = [
       "M",
       "L"
     ],
-    "activo": true
+    "activo": true,
+    "fotos": [
+      "recursosgraficos/cabezal-combate.webp"
+    ]
   },
   {
     "id": "guantes",
     "cat": "protecciones",
     "name": "Guantes de combate",
     "price": 13990,
-    "img": "recursosgraficos/guantes-combate.webp",
     "short": "Guantes",
     "spec": "Dedos libres para agarrar y bloquear.",
     "sizes": [
@@ -208,17 +240,22 @@ window.KO_PRODUCTOS = [
       "L",
       "XL"
     ],
-    "activo": true
+    "activo": true,
+    "fotos": [
+      "recursosgraficos/guantes-combate.webp"
+    ]
   },
   {
     "id": "bucal",
     "cat": "protecciones",
     "name": "Protector bucal",
     "price": 3990,
-    "img": "recursosgraficos/protector-bucal.webp",
     "short": "Bucal",
     "spec": "Termomoldeable, con estuche.",
     "sizes": [],
-    "activo": true
+    "activo": true,
+    "fotos": [
+      "recursosgraficos/protector-bucal.webp"
+    ]
   }
 ];
