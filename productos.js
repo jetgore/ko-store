@@ -6,13 +6,13 @@ window.KO_PRODUCTOS = [
     "cat": "electronicos",
     "name": "Pechera electronica KPNP",
     "price": 80000,
-    "fotos": [
-      "recursosgraficos/productos/pechera-electronica-kpnp-mw1ebno2jd13.webp"
-    ],
     "short": "Pechera",
     "spec": "",
     "sizes": [],
-    "activo": true
+    "activo": false,
+    "fotos": [
+      "recursosgraficos/productos/pechera-electronica-kpnp-mw1ebno2jd13.webp"
+    ]
   },
   {
     "id": "dobok-fighter",
@@ -45,7 +45,10 @@ window.KO_PRODUCTOS = [
     "id": "dobok-basic",
     "cat": "doboks",
     "name": "Dobok de entrenamiento Basic",
-    "price": 24990,
+    "price": 2199,
+    "fotos": [
+      "recursosgraficos/dobokfighter.webp"
+    ],
     "short": "Basic",
     "spec": "Algodón mezcla para el uso diario en el dojang.",
     "sizes": [
@@ -60,10 +63,7 @@ window.KO_PRODUCTOS = [
       "190",
       "200"
     ],
-    "activo": true,
-    "fotos": [
-      "recursosgraficos/dobokfighter.webp"
-    ]
+    "activo": true
   },
   {
     "id": "dobok-poomsae-dan",
@@ -107,7 +107,7 @@ window.KO_PRODUCTOS = [
       "200"
     ],
     "badge": "Aprobado WT",
-    "activo": true,
+    "activo": false,
     "fotos": [
       "recursosgraficos/dobokpoomsae2.webp"
     ]
@@ -115,8 +115,11 @@ window.KO_PRODUCTOS = [
   {
     "id": "pechera-pro",
     "cat": "protecciones",
-    "name": "Pechera reversible Pro",
-    "price": 29990,
+    "name": "Pechera reversible",
+    "price": 27990,
+    "fotos": [
+      "recursosgraficos/pechera.webp"
+    ],
     "short": "Pechera",
     "spec": "Reversible chung / hong, espuma de alta densidad.",
     "sizes": [
@@ -128,10 +131,7 @@ window.KO_PRODUCTOS = [
       "5"
     ],
     "activo": true,
-    "destacado": true,
-    "fotos": [
-      "recursosgraficos/pechera.webp"
-    ]
+    "destacado": true
   },
   {
     "id": "pechera-junior",
