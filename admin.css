@@ -86,13 +86,24 @@
 .chip-sm { min-height: 32px; padding: 0 12px; font-size: .82rem; }
 .photos { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px 16px; margin: 0; display: grid; gap: 14px; }
 .photos legend { font-weight: 650; padding: 0 6px; }
-.photo-slot { display: grid; grid-template-columns: 80px 1fr; gap: 14px; align-items: center; }
-.photo-slot > div:last-child { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
-.photo-label { width: 100%; font-size: .9rem; font-weight: 600; }
-.photo-prev { width: 80px; height: 100px; background: var(--mist); border-radius: 2px; display: grid; place-items: center; overflow: hidden; }
+.thumb-count { margin-top: 4px; font-size: .72rem; color: var(--ink-soft); text-align: center; }
+.photo-help { font-size: .85rem; color: var(--ink-soft); }
+.photo-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px; }
+.photo-grid:empty { display: none; }
+.photo-item { display: grid; gap: 4px; }
+.photo-prev { position: relative; aspect-ratio: 4 / 5; background: var(--mist); border-radius: 2px; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--line); }
 .photo-prev img { width: 100%; height: 100%; object-fit: contain; background: var(--paper); }
 .photo-prev img.cover { object-fit: cover; }
 .photo-prev span { font-size: .7rem; color: #A9AEB7; font-weight: 700; }
+.photo-main { position: absolute; top: 4px; left: 4px; padding: 1px 6px; border-radius: 8px; font-size: .65rem; font-weight: 700; text-transform: uppercase; color: var(--paper); background: var(--ink); }
+.photo-tools { display: flex; justify-content: space-between; align-items: center; }
+.photo-tools button { background: none; border: 1px solid var(--line); border-radius: 2px; width: 28px; height: 28px; display: grid; place-items: center; font: inherit; font-size: .9rem; color: var(--ink); cursor: pointer; }
+.photo-tools button:hover:not(:disabled) { border-color: var(--ink); }
+.photo-tools button:disabled { opacity: .3; cursor: default; }
+.photo-tools .photo-del { color: var(--hong); }
+.photo-add { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.photo-add .btn.is-disabled { opacity: .45; pointer-events: none; }
+.photo-count { font-size: .85rem; color: var(--ink-soft); }
 .checks { display: grid; gap: 10px; }
 
 @media (max-width: 760px) {

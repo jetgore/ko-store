@@ -244,6 +244,23 @@ section[id] { scroll-margin-top: 80px; }
 .ph-swap img + img { opacity: 0; }
 .product:hover .ph-swap img:first-child { opacity: 0; }
 .product:hover .ph-swap img + img { opacity: 1; }
+/* Galería (3 o más fotos) */
+.ph-gallery img { position: absolute; inset: 0; opacity: 0; transition: opacity .3s; }
+.ph-gallery img.is-on { opacity: 1; }
+.ph-nav {
+  position: absolute; top: 50%; z-index: 2; transform: translateY(-50%);
+  width: 34px; height: 34px; border-radius: 50%; border: 0;
+  display: grid; place-items: center; cursor: pointer;
+  color: var(--ink); background: rgba(255, 255, 255, .9); box-shadow: 0 1px 4px rgba(0, 0, 0, .15);
+  opacity: 0; transition: opacity .2s;
+}
+.ph-prev { left: 8px; }
+.ph-next { right: 8px; }
+.product:hover .ph-nav, .ph-nav:focus-visible { opacity: 1; }
+@media (hover: none) { .ph-nav { opacity: 1; } }
+.ph-dots { position: absolute; bottom: 10px; left: 0; right: 0; z-index: 2; display: flex; justify-content: center; gap: 5px; }
+.ph-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(0, 0, 0, .2); }
+.ph-dots i.is-on { background: var(--ink); }
 
 /* ---------- Combate / poomsae ---------- */
 .dobok-split {

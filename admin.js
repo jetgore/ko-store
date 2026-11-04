@@ -10,6 +10,7 @@
   const PHOTO_DIR = 'recursosgraficos/productos';
   const TOKEN_KEY = 'ko-admin-token';
   const MAX_DESTACADOS = 4;
+  const MAX_FOTOS = 8;
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
@@ -60,10 +61,17 @@
   const decode = (b64) => new TextDecoder().decode(
     Uint8Array.from(atob(b64.replace(/\s/g, '')), (c) => c.charCodeAt(0)));
 
+  // Las fotos se guardan como lista en "fotos". Los productos antiguos usaban img/img2.
+  function normalize(p) {
+    const fotos = (Array.isArray(p.fotos) ? p.fotos : [p.img, p.img2]).filter(Boolean);
+    const { img, img2, fotos: _, ...rest } = p;
+    return { ...rest, fotos };
+  }
+
   function parseFile(text) {
     const start = text.indexOf('[', text.indexOf('KO_PRODUCTOS'));
     const end = text.lastIndexOf(']');
-    return JSON.parse(text.slice(start, end + 1));
+    return JSON.parse(text.slice(start, end + 1)).map(normalize);
   }
 
   function serialize(list) {
@@ -95,8 +103,18 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
     const commit = await gh(`/git/commits/${head}`);
 
     // Solo se suben las fotos que siguen en uso
-    const used = new Set(products.flatMap((p) => [p.img, p.img2]).filter(Boolean));
+    const used = new Set(products.flatMap((p) => p.fotos));
     const entries = [];
+
+    // Fotos subidas por el panel que ya ningún producto usa: se borran del repositorio
+    const before = new Set(JSON.parse(saved).flatMap((p) => p.fotos));
+    const unused = [...before].filter((f) => f.startsWith(`${PHOTO_DIR}/`) && !used.has(f));
+    if (unused.length) {
+      let existing = [];
+      try { existing = (await gh(`/contents/${PHOTO_DIR}?ref=${head}`)).map((f) => f.path); } catch (e) { if (e.status !== 404) throw e; }
+      unused.filter((f) => existing.includes(f))
+        .forEach((path) => entries.push({ path, mode: '100644', type: 'blob', sha: null }));
+    }
     for (const [path, photo] of photos) {
       if (!used.has(path)) continue;
       const blob = await gh('/git/blobs', { method: 'POST', body: JSON.stringify({ content: photo.base64, encoding: 'base64' }) });
@@ -164,9 +182,9 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
 
     $('rows').innerHTML = list.map((p) => `
       <tr data-id="${esc(p.id)}" class="${p.activo === false ? 'is-hidden' : ''}">
-        <td><div class="thumb">${p.img
-          ? `<img src="${esc(photoSrc(p.img))}" alt="" class="${p.fit === 'cover' ? 'cover' : ''}">`
-          : '<span>Sin foto</span>'}</div></td>
+        <td><div class="thumb">${p.fotos[0]
+          ? `<img src="${esc(photoSrc(p.fotos[0]))}" alt="" class="${p.fit === 'cover' ? 'cover' : ''}">`
+          : '<span>Sin foto</span>'}</div>${p.fotos.length > 1 ? `<p class="thumb-count">${p.fotos.length} fotos</p>` : ''}</td>
         <td><p class="row-name">${esc(p.name)}</p><p class="row-cat">${esc(CATS[p.cat] || p.cat)}${p.etiqueta ? ` · <span class="pill pill-${esc(p.etiqueta)}">${p.etiqueta === 'oferta' ? 'Oferta' : 'Nuevo'}</span>` : ''}</p></td>
         <td class="row-price">${fmt(p.price)}${p.oldPrice ? `<s>${fmt(p.oldPrice)}</s>` : ''}</td>
         <td><label class="switch"><input type="checkbox" data-act="activo" ${p.activo !== false ? 'checked' : ''} aria-label="Visible: ${esc(p.name)}"><span></span></label></td>
@@ -224,7 +242,7 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
   const editor = $('editor');
   const form = $('editForm');
   let editing = null; // producto original (null = nuevo)
-  let draftPhotos = {};
+  let draftPhotos = [];
 
   $('f-cat').innerHTML = Object.entries(CATS).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('');
   $('presets').innerHTML = [
@@ -236,13 +254,27 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
     if (b) $('f-sizes').value = b.dataset.sizes;
   });
 
-  function drawPhoto(slot) {
-    const el = form.querySelector(`[data-slot="${slot}"]`);
-    const path = draftPhotos[slot];
-    el.querySelector('.photo-prev').innerHTML = path
-      ? `<img src="${esc(photoSrc(path))}" alt="" class="${$('f-cover').checked ? 'cover' : ''}">`
-      : '<span>Sin foto</span>';
-    el.querySelector('.photo-remove').hidden = !path;
+  function drawPhotos() {
+    const cover = $('f-cover').checked ? 'cover' : '';
+    const last = draftPhotos.length - 1;
+    $('photoGrid').innerHTML = draftPhotos.map((path, i) => `
+      <li class="photo-item" data-i="${i}">
+        <div class="photo-prev">
+          <img src="${esc(photoSrc(path))}" alt="Foto ${i + 1}" class="${cover}">
+          ${i === 0 ? '<span class="photo-main">Principal</span>' : ''}
+        </div>
+        <div class="photo-tools">
+          <button type="button" data-move="-1" ${i === 0 ? 'disabled' : ''} aria-label="Mover foto ${i + 1} antes" title="Mover antes">&larr;</button>
+          <button type="button" class="photo-del" aria-label="Quitar foto ${i + 1}" title="Quitar">&times;</button>
+          <button type="button" data-move="1" ${i === last ? 'disabled' : ''} aria-label="Mover foto ${i + 1} después" title="Mover después">&rarr;</button>
+        </div>
+      </li>`).join('');
+    const full = draftPhotos.length >= MAX_FOTOS;
+    $('photoAddBtn').classList.toggle('is-disabled', full);
+    $('photoInput').disabled = full;
+    $('photoCount').textContent = draftPhotos.length
+      ? `${draftPhotos.length} de ${MAX_FOTOS} fotos`
+      : 'Sin fotos: la tienda muestra el nombre en un recuadro gris.';
   }
 
   function openEditor(p) {
@@ -263,9 +295,8 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
     $('f-activo').checked = d.activo !== false;
     $('f-destacado').checked = Boolean(d.destacado);
     $('editMsg').textContent = '';
-    draftPhotos = { img: d.img || null, img2: d.img2 || null };
-    drawPhoto('img');
-    drawPhoto('img2');
+    draftPhotos = [...(d.fotos || [])];
+    drawPhotos();
     editor.showModal();
     $('f-name').focus();
   }
@@ -274,29 +305,39 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
   $('f-name').addEventListener('input', () => {
     if (!editing) $('f-id').value = slug($('f-name').value);
   });
-  $('f-cover').addEventListener('change', () => { drawPhoto('img'); drawPhoto('img2'); });
+  $('f-cover').addEventListener('change', drawPhotos);
 
-  form.querySelectorAll('.photo-slot').forEach((el) => {
-    const slot = el.dataset.slot;
-    el.querySelector('input[type=file]').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      e.target.value = '';
-      if (!file) return;
+  $('photoInput').addEventListener('change', async (e) => {
+    const files = [...e.target.files];
+    e.target.value = '';
+    const room = MAX_FOTOS - draftPhotos.length;
+    $('editMsg').textContent = files.length > room
+      ? `Cada producto puede tener hasta ${MAX_FOTOS} fotos; se agregaron solo ${room}.` : '';
+    const id = slug($('f-id').value || $('f-name').value) || 'producto';
+    for (const file of files.slice(0, room)) {
       try {
         const res = await processImage(file);
-        const id = slug($('f-id').value || $('f-name').value) || 'producto';
-        const path = `${PHOTO_DIR}/${id}-${slot === 'img' ? '1' : '2'}-${Date.now().toString(36)}.${res.ext}`;
+        const path = `${PHOTO_DIR}/${id}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}.${res.ext}`;
         photos.set(path, res);
-        draftPhotos[slot] = path;
-        drawPhoto(slot);
+        draftPhotos.push(path);
+        drawPhotos();
       } catch (err) {
-        $('editMsg').textContent = err.message;
+        $('editMsg').textContent = `${file.name}: ${err.message}`;
       }
-    });
-    el.querySelector('.photo-remove').addEventListener('click', () => {
-      draftPhotos[slot] = null;
-      drawPhoto(slot);
-    });
+    }
+  });
+
+  $('photoGrid').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const i = Number(btn.closest('.photo-item').dataset.i);
+    if (btn.classList.contains('photo-del')) {
+      draftPhotos.splice(i, 1);
+    } else {
+      const j = i + Number(btn.dataset.move);
+      [draftPhotos[i], draftPhotos[j]] = [draftPhotos[j], draftPhotos[i]];
+    }
+    drawPhotos();
   });
 
   const closeEditor = () => editor.close();
@@ -323,13 +364,12 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
 
     const p = {
       id, cat: $('f-cat').value, name, price,
-      img: draftPhotos.img || null,
+      fotos: [...draftPhotos],
       short: (editing && editing.short) || name.split(' ')[0],
       spec: $('f-spec').value.trim(),
       sizes: $('f-sizes').value.split(',').map((s) => s.trim()).filter(Boolean),
       activo: $('f-activo').checked,
     };
-    if (draftPhotos.img2) p.img2 = draftPhotos.img2;
     if ($('f-cover').checked) p.fit = 'cover';
     if ($('f-badge').value.trim()) p.badge = $('f-badge').value.trim();
     if ($('f-etiqueta').value) p.etiqueta = $('f-etiqueta').value;

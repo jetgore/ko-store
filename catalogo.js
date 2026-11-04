@@ -1,8 +1,9 @@
 // KO Store — categorías y tallas del catálogo
 // Los productos están en productos.js y se administran desde admin.html.
 // Campos de cada producto:
-// img: ruta de la foto (null si aún no hay foto)
-// img2: segunda foto que aparece al pasar el mouse (opcional)
+// fotos: lista de rutas de fotos; la primera es la principal ([] si aún no hay foto).
+//   Con 2 fotos la segunda aparece al pasar el mouse; con 3 o más la tarjeta muestra flechas.
+//   (Los productos antiguos con img/img2 se siguen leyendo.)
 // fit: "cover" si la foto es un primer plano que debe llenar el recuadro
 // sizes: lista de tallas; [] si es talla única
 // etiqueta: 'nuevo' u 'oferta' para mostrar un distintivo sobre la foto (opcional)
@@ -25,5 +26,12 @@ window.KO_TALLAS = {
   Protecciones: ['XS', 'S', 'M', 'L', 'XL'],
   Pechera: ['0', '1', '2', '3', '4', '5'],
 };
+
+// img e img2 quedan disponibles para el carro y la tarjeta
+(window.KO_PRODUCTOS || []).forEach((p) => {
+  p.fotos = (Array.isArray(p.fotos) ? p.fotos : [p.img, p.img2]).filter(Boolean);
+  p.img = p.fotos[0] || null;
+  p.img2 = p.fotos[1] || null;
+});
 
 window.KO_CATALOG = (window.KO_PRODUCTOS || []).filter((p) => p.activo !== false);

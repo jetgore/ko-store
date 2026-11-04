@@ -152,21 +152,11 @@
 
         <fieldset class="photos">
           <legend>Fotos</legend>
-          <div class="photo-slot" data-slot="img">
-            <div class="photo-prev"></div>
-            <div>
-              <p class="photo-label">Foto principal</p>
-              <label class="btn btn-ghost btn-sm">Subir foto<input type="file" accept="image/*" hidden></label>
-              <button type="button" class="link-btn photo-remove">Quitar</button>
-            </div>
-          </div>
-          <div class="photo-slot" data-slot="img2">
-            <div class="photo-prev"></div>
-            <div>
-              <p class="photo-label">Segunda foto (al pasar el mouse)</p>
-              <label class="btn btn-ghost btn-sm">Subir foto<input type="file" accept="image/*" hidden></label>
-              <button type="button" class="link-btn photo-remove">Quitar</button>
-            </div>
+          <p class="photo-help">La primera es la foto principal. Con 2 fotos, la segunda aparece al pasar el mouse; con 3 o más, la tarjeta muestra flechas para verlas todas.</p>
+          <ul class="photo-grid" id="photoGrid"></ul>
+          <div class="photo-add">
+            <label class="btn btn-ghost btn-sm" id="photoAddBtn">Agregar fotos<input type="file" id="photoInput" accept="image/*" multiple hidden></label>
+            <span class="photo-count" id="photoCount"></span>
           </div>
           <label class="check"><input type="checkbox" id="f-cover"> La foto es un primer plano: que llene todo el recuadro</label>
         </fieldset>

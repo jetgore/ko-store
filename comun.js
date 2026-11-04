@@ -59,6 +59,18 @@
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   window.KOEsc = esc;
 
+  // Flechas de las tarjetas con 3 o más fotos
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.ph-nav');
+    if (!btn) return;
+    const box = btn.closest('.ph-gallery');
+    const imgs = box.querySelectorAll('img');
+    const i = (Number(box.dataset.i) + Number(btn.dataset.step) + imgs.length) % imgs.length;
+    box.dataset.i = i;
+    imgs.forEach((img, k) => img.classList.toggle('is-on', k === i));
+    box.querySelectorAll('.ph-dots i').forEach((d, k) => d.classList.toggle('is-on', k === i));
+  });
+
   // Tarjeta de producto compartida por la tienda y "Más vendidos".
   // pickSize: false deja solo el botón (la talla se elige en el carro)
   window.KOProductCard = function (p, { pickSize = true } = {}) {
@@ -68,12 +80,25 @@
     const price = p.oldPrice
       ? `<p class="price on-sale">${fmt(p.price)}<s class="price-old">${fmt(p.oldPrice)}</s></p>`
       : `<p class="price">${fmt(p.price)}</p>`;
-    const media = p.img
-      ? `<div class="ph ph-photo${p.img2 ? ' ph-swap' : ''}">${label}
-           <img src="${esc(p.img)}" alt="${esc(p.name)}" class="${p.fit === 'cover' ? 'cover' : ''}" loading="lazy">
-           ${p.img2 ? `<img src="${esc(p.img2)}" alt="" aria-hidden="true" loading="lazy">` : ''}
-         </div>`
-      : `<div class="ph" role="img" aria-label="${esc(p.name)}, foto pendiente">${label}<span>${esc(p.short)}</span></div>`;
+    const fotos = p.fotos || [p.img, p.img2].filter(Boolean);
+    const fit = p.fit === 'cover' ? 'cover' : '';
+    let media;
+    if (fotos.length > 2) {
+      // Galería: flechas y puntos para recorrer todas las fotos
+      media = `<div class="ph ph-photo ph-gallery" data-i="0">${label}
+           ${fotos.map((f, i) => `<img src="${esc(f)}" alt="${i === 0 ? esc(p.name) : `${esc(p.name)}, foto ${i + 1}`}" class="${fit}${i === 0 ? ' is-on' : ''}" loading="lazy">`).join('')}
+           <button type="button" class="ph-nav ph-prev" data-step="-1" aria-label="Foto anterior"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+           <button type="button" class="ph-nav ph-next" data-step="1" aria-label="Foto siguiente"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+           <span class="ph-dots" aria-hidden="true">${fotos.map((_, i) => `<i class="${i === 0 ? 'is-on' : ''}"></i>`).join('')}</span>
+         </div>`;
+    } else if (fotos.length) {
+      media = `<div class="ph ph-photo${fotos[1] ? ' ph-swap' : ''}">${label}
+           <img src="${esc(fotos[0])}" alt="${esc(p.name)}" class="${fit}" loading="lazy">
+           ${fotos[1] ? `<img src="${esc(fotos[1])}" alt="" aria-hidden="true" class="${fit}" loading="lazy">` : ''}
+         </div>`;
+    } else {
+      media = `<div class="ph" role="img" aria-label="${esc(p.name)}, foto pendiente">${label}<span>${esc(p.short)}</span></div>`;
+    }
     let size = '';
     if (pickSize) {
       size = p.sizes.length
