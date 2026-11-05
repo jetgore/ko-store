@@ -2,6 +2,13 @@
 // Si lo editas a mano, mantén el formato JSON después de "window.KO_COMENTARIOS =".
 window.KO_COMENTARIOS = [
   {
+    "id": 4,
+    "nombre": "Juan carlo bodoque",
+    "lugar": "Santiago",
+    "texto": "Muy buenos los productos ,y los precios están excelentes ,y la modelo muy guapa",
+    "fecha": "2026-11-04"
+  },
+  {
     "id": 3,
     "nombre": "Juancito",
     "lugar": "Santiago",
