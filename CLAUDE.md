@@ -1,6 +1,6 @@
 # KO Store
 
-Tienda online de equipamiento de taekwondo WT (Santiago, Chile). Sitio estático en HTML, CSS y JavaScript sin frameworks ni paso de build, publicado en Vercel desde `main` de `jetgore/ko-store`.
+Tienda online de equipamiento de taekwondo WT (Santiago, Chile). Sitio estático en HTML, CSS y JavaScript sin frameworks, publicado en Vercel desde `main` de `jetgore/ko-store`. Un único paso de build sin dependencias (`node scripts/build.js`, ver "SEO y páginas generadas") arma el sitio en `dist/`.
 
 ## Idioma y tono
 
@@ -13,7 +13,12 @@ Tienda online de equipamiento de taekwondo WT (Santiago, Chile). Sitio estático
 | Archivo | Qué hace |
 |---|---|
 | `index.html` | Portada: hero, categorías, combate vs. poomsae, "Más vendidos", calculadora de tallas, comentarios y cotización para clubes |
-| `tienda.html` + `tienda.js` | Catálogo con filtros por categoría, búsqueda y orden |
+| `tienda.html` + `tienda.js` | Catálogo con búsqueda y orden. Los filtros de categoría son enlaces a las páginas de categoría (`doboks.html`, etc.), que se generan desde `tienda.html` con `<body data-cat>` |
+| `producto.js` | Interacción de las páginas de producto generadas (`producto/<id>.html`): miniaturas y agregar al carro |
+| `scripts/build.js` | Genera `dist/`: copia el sitio, crea las páginas de producto y de categoría, los datos estructurados y `sitemap.xml` |
+| `scripts/serve.js` | Vista previa local: ejecuta el build y sirve `dist/` en http://localhost:5173 |
+| `vercel.json` | Le indica a Vercel que ejecute el build y publique `dist/` |
+| `robots.txt` | Indica dónde está el sitemap |
 | `ayuda.html` | Envíos, cambios, preguntas frecuentes y formulario de contacto (`#contacto`) |
 | `admin.html` + `admin.js` + `admin.css` | Panel de productos y moderación de comentarios (ver más abajo). Tiene `noindex` y no se enlaza desde el sitio |
 | `productos.js` | **Datos de los productos** (`window.KO_PRODUCTOS`). Lo genera el panel |
@@ -43,7 +48,7 @@ Todo se comunica con globales en `window` (`KO_CONFIG`, `KO_PRODUCTOS`, `KO_CATA
 
 ## Productos
 
-Campos de cada producto en `productos.js`: `id`, `cat`, `name`, `price`, `fotos` (lista; la primera es la principal; los antiguos `img`/`img2` se siguen leyendo), `fit` (`'cover'`), `short`, `spec`, `sizes` (`[]` = talla única), `badge`, `etiqueta` (`'nuevo'` | `'oferta'`), `oldPrice`, `activo`, `destacado` (máximo 4, se muestran en la portada).
+Campos de cada producto en `productos.js`: `id`, `cat`, `name`, `price`, `fotos` (lista; la primera es la principal; los antiguos `img`/`img2` se siguen leyendo), `fit` (`'cover'`), `short`, `spec`, `sizes` (`[]` = talla única), `badge`, `etiqueta` (`'nuevo'` | `'oferta'`), `oldPrice`, `activo`, `destacado` (máximo 4, se muestran en la portada), `desc` (descripción completa, opcional; se muestra en la página del producto).
 
 - `productos.js` debe mantener el formato exacto que escribe el panel: dos líneas de comentario y luego `window.KO_PRODUCTOS = <JSON>;`. El panel lo lee buscando el JSON después de `KO_PRODUCTOS`, así que debe seguir siendo JSON válido (comillas dobles, sin comentarios ni comas finales).
 - El `id` se usa en el carro guardado de los clientes: no cambiar el `id` de un producto existente.
@@ -64,13 +69,21 @@ Consecuencia: **GitHub puede tener commits que no están en la copia local**. An
 - Variables de entorno en Vercel (Settings → Environment Variables): `RESEND_API_KEY`, `CONTACTO_EMAIL`, `CONTACTO_REMITENTE` (opcional), `GITHUB_TOKEN` (fine-grained del dueño, solo Issues: Read and write sobre el repo) y `GITHUB_REPO` (opcional). Sin ellas, los formularios responden "no disponible" y muestran el correo de `KO_CONFIG.email`.
 - El token del panel necesita Contents **e Issues** en Read and write.
 
+## SEO y páginas generadas
+
+- Dominio canónico: `https://ko-store.vercel.app` (constante `SITE` en `scripts/build.js` y en los `<link rel="canonical">` / `og:` de `index.html`, `tienda.html` y `ayuda.html`, más `robots.txt`). Si cambia el dominio, actualizarlo en todos esos lugares.
+- `scripts/build.js` corre en cada publicación de Vercel y genera en `dist/` (que está en `.gitignore`): `producto/<id>.html` por cada producto activo, una página por categoría (`<clave>.html`, con textos en `CAT_SEO`), el JSON-LD (`Product`, `BreadcrumbList`, `ItemList`) y `sitemap.xml`. Las categorías sin productos quedan con `noindex` y fuera del sitemap.
+- Las páginas de producto usan `<base href="/">`: dentro de ellas, las rutas relativas se resuelven desde la raíz.
+- Los textos de categoría y producto siguen la regla de no inventar datos del negocio.
+- Si el build falla, Vercel no publica y el sitio sigue con la versión anterior.
+
 ## Desarrollo local
 
-No hay build. Basta con cualquier servidor estático en la raíz del proyecto (las funciones de `api/` solo corren en Vercel o con `npx vercel dev`); abrir los `.html` con `file://` no carga bien los estilos ni las imágenes. Por ejemplo:
-
 ```bash
-npx serve .
+node scripts/serve.js
 ```
+
+Arma `dist/` y lo sirve en http://localhost:5173 (las funciones de `api/` solo corren en Vercel o con `npx vercel dev`). Las páginas de producto y de categoría solo existen en `dist/`; abrir los `.html` con `file://` no carga bien los estilos ni las imágenes.
 
 Revisar siempre en ancho de celular (375 px): la mayoría de las visitas llegan desde redes sociales.
 
