@@ -293,6 +293,7 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
     $('f-price').value = d.price ?? '';
     $('f-old').value = d.oldPrice ?? '';
     $('f-spec').value = d.spec || '';
+    $('f-desc').value = d.desc || '';
     $('f-etiqueta').value = d.etiqueta || '';
     $('f-badge').value = d.badge || '';
     $('f-sizes').value = (d.sizes || []).join(', ');
@@ -375,6 +376,7 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
       sizes: $('f-sizes').value.split(',').map((s) => s.trim()).filter(Boolean),
       activo: $('f-activo').checked,
     };
+    if ($('f-desc').value.trim()) p.desc = $('f-desc').value.trim();
     if ($('f-cover').checked) p.fit = 'cover';
     if ($('f-badge').value.trim()) p.badge = $('f-badge').value.trim();
     if ($('f-etiqueta').value) p.etiqueta = $('f-etiqueta').value;

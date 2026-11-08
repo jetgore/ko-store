@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ko-store.vercel.app/sitemap.xml

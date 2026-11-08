@@ -11,39 +11,35 @@
   const resultCount = document.getElementById('resultCount');
   const noResults = document.getElementById('noResults');
 
+  // En las páginas de categoría (doboks.html, protecciones.html…) la categoría viene fija en <body data-cat>
+  const FIXED = CATS[document.body.dataset.cat] ? document.body.dataset.cat : null;
+
+  // Enlaces antiguos tipo tienda.html#doboks: se envían a la página de la categoría
+  const h = location.hash.replace('#', '');
+  if (!FIXED && CATS[h]) { location.replace(`${h}.html`); return; }
+
   document.getElementById('year').textContent = new Date().getFullYear();
-  document.getElementById('shopLead').textContent =
-    `${ALL.length} productos de taekwondo WT, desde doboks hasta sistemas electrónicos. Despachamos a todo Chile.`;
+  if (!FIXED) {
+    document.getElementById('shopLead').textContent =
+      `${ALL.length} productos de taekwondo WT, desde doboks hasta sistemas electrónicos. Despachamos a todo Chile.`;
+  }
 
-  const fromHash = () => {
-    const h = location.hash.replace('#', '');
-    return CATS[h] ? h : 'todo';
-  };
-  let state = { cat: fromHash(), q: '', sort: 'destacados' };
+  let state = { cat: FIXED || 'todo', q: '', sort: 'destacados' };
 
-  // ---------- Chips de categoría ----------
+  // ---------- Categorías: enlaces a la página de cada una ----------
   const countBy = (cat) => ALL.filter((p) => p.cat === cat).length;
+  const chip = (href, key, label, n) =>
+    `<a class="chip" href="${href}"${key === state.cat ? ' aria-current="page"' : ''}>${label} <span>${n}</span></a>`;
   chips.innerHTML = [
-    `<button type="button" class="chip" data-cat="todo">Todo <span>${ALL.length}</span></button>`,
-    ...Object.entries(CATS).map(([key, label]) =>
-      `<button type="button" class="chip" data-cat="${key}">${label} <span>${countBy(key)}</span></button>`),
+    chip('tienda.html', 'todo', 'Todo', ALL.length),
+    ...Object.entries(CATS).map(([key, label]) => chip(`${key}.html`, key, label, countBy(key))),
   ].join('');
-
-  chips.addEventListener('click', (e) => {
-    const btn = e.target.closest('.chip');
-    if (!btn) return;
-    state.cat = btn.dataset.cat;
-    history.replaceState(null, '', state.cat === 'todo' ? location.pathname : '#' + state.cat);
-    render();
-  });
-  window.addEventListener('hashchange', () => { state.cat = fromHash(); render(); });
 
   q.addEventListener('input', () => { state.q = q.value.trim().toLowerCase(); render(); });
   sort.addEventListener('change', () => { state.sort = sort.value; render(); });
   document.getElementById('resetFilters').addEventListener('click', () => {
-    state = { cat: 'todo', q: '', sort: state.sort };
+    state = { cat: FIXED || 'todo', q: '', sort: state.sort };
     q.value = '';
-    history.replaceState(null, '', location.pathname);
     render();
   });
 
@@ -53,9 +49,6 @@
   const card = (p) => window.KOProductCard(p);
 
   function render() {
-    chips.querySelectorAll('.chip').forEach((c) =>
-      c.setAttribute('aria-pressed', String(c.dataset.cat === state.cat)));
-
     let list = ALL.filter((p) => state.cat === 'todo' || p.cat === state.cat);
     if (state.q) {
       const term = norm(state.q);

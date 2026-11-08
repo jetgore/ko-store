@@ -9,3 +9,6 @@ recursosgraficos/kostore.png
 
 # Configuración local de Claude Code
 .claude/
+
+# Sitio armado por scripts/build.js (Vercel lo genera en cada publicación)
+dist/

@@ -428,6 +428,7 @@ button.cart { background: none; border: 0; cursor: pointer; font: inherit; }
 }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
+  display: inline-flex; align-items: center; text-decoration: none;
   font: inherit; font-size: .92rem; font-weight: 600;
   min-height: 40px; padding: 0 16px;
   border: 1.5px solid var(--line); border-radius: 20px;
@@ -435,8 +436,8 @@ button.cart { background: none; border: 0; cursor: pointer; font: inherit; }
 }
 .chip span { color: var(--ink-soft); font-weight: 500; margin-left: 4px; }
 .chip:hover { border-color: var(--ink); }
-.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
-.chip[aria-pressed="true"] span { color: #B9BDC5; }
+.chip[aria-current="page"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.chip[aria-current="page"] span { color: #B9BDC5; }
 
 .toolbar-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
 .search { position: relative; flex: 1 1 280px; max-width: 420px; }
@@ -649,4 +650,49 @@ button[type="submit"]:disabled { opacity: .6; cursor: wait; }
 
 @media (max-width: 760px) {
   .reviews, .row-fields { grid-template-columns: 1fr; }
+}
+
+/* Nombre del producto en la tarjeta: enlace a su página */
+.product h3 a { color: inherit; text-decoration: none; }
+.product h3 a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Ruta de navegación (Inicio › Categoría › Producto) */
+.crumbs { font-size: .88rem; color: var(--ink-soft); }
+.crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; }
+.crumbs li + li::before { content: "›"; margin-right: 6px; }
+.crumbs a { color: inherit; }
+.crumbs [aria-current] { color: var(--ink); }
+.shop-head .crumbs { margin-bottom: 18px; }
+
+/* Texto de la categoría bajo la grilla */
+.cat-intro { padding: clamp(40px, 6vw, 64px) 0; border-top: 1px solid var(--line); }
+.cat-intro h2 { font-size: 1.4rem; font-weight: 750; }
+.cat-intro p { margin-top: 12px; max-width: 68ch; color: var(--ink-soft); }
+
+/* Página de producto */
+.pdp { padding: clamp(24px, 4vw, 40px) 0 clamp(48px, 7vw, 88px); }
+.pdp-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 64px); margin-top: 24px; align-items: start; }
+.pdp-main { aspect-ratio: 4 / 5; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); display: grid; place-items: center; overflow: hidden; }
+.pdp-main img { width: 100%; height: 100%; object-fit: contain; padding: 16px; }
+.pdp-main img.cover { object-fit: cover; padding: 0; }
+.pdp-main span { font-weight: 900; font-stretch: 125%; font-size: 2rem; color: #C3C7CE; }
+.pdp-thumbs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.pdp-thumbs button { width: 72px; height: 72px; padding: 4px; background: var(--paper); border: 1.5px solid var(--line); border-radius: var(--radius); cursor: pointer; }
+.pdp-thumbs button[aria-current="true"] { border-color: var(--ink); }
+.pdp-thumbs img { width: 100%; height: 100%; object-fit: contain; }
+.pdp-info h1 { font-weight: 850; font-stretch: 112%; font-size: clamp(1.8rem, 3.6vw, 2.8rem); line-height: 1.05; letter-spacing: -0.02em; margin-top: 6px; }
+.pdp-info .price { font-size: 1.6rem; margin-top: 18px; }
+.pdp-info .spec { font-size: 1rem; margin-top: 14px; flex-grow: 0; }
+.pdp-buy { margin-top: 22px; display: grid; gap: 6px; max-width: 420px; }
+.pdp-buy .btn-add { margin-top: 8px; background: var(--ink); color: var(--paper); }
+.pdp-buy .btn-add:hover { background: #2B3038; }
+.pdp-perks { margin-top: 26px; padding: 0; list-style: none; display: grid; gap: 8px; font-size: .92rem; color: var(--ink-soft); border-top: 1px solid var(--line); padding-top: 18px; }
+.pdp-perks a { color: var(--chung); }
+.pdp-desc { margin-top: 28px; display: grid; gap: 12px; color: var(--ink-soft); max-width: 62ch; }
+.pdp-desc h2 { font-size: 1.15rem; font-weight: 750; color: var(--ink); }
+.pdp-related { background: var(--mist); padding: clamp(48px, 7vw, 88px) 0; }
+.pdp-related h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 24px; }
+.product .btn-view { margin-top: 14px; min-height: 44px; }
+@media (max-width: 760px) {
+  .pdp-grid { grid-template-columns: 1fr; }
 }

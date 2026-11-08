@@ -159,7 +159,7 @@
       <article class="product" data-id="${esc(p.id)}">
         ${media}
         <p class="tag${p.badge ? ' tag-wt' : ''}">${esc(p.badge || window.KO_CATEGORIES[p.cat])}</p>
-        <h3>${esc(p.name)}</h3>
+        <h3><a href="producto/${esc(p.id)}.html">${esc(p.name)}</a></h3>
         <p class="spec">${esc(p.spec)}</p>
         ${price}
         ${size}
