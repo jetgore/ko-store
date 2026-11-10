@@ -33,6 +33,7 @@
         <ol>
           <li>Entra a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub → Settings → Fine-grained tokens</a>.</li>
           <li>En <em>Repository access</em> elige <em>Only select repositories</em> y marca solo <code id="repoName2"></code>.</li>
+          <li>En <em>Expiration</em> elige 30 días: si el token se filtra, deja de servir solo.</li>
           <li>En <em>Permissions → Repository permissions</em>, pon <em>Contents</em> e <em>Issues</em> en <em>Read and write</em> (Issues es para revisar los comentarios).</li>
           <li>Crea el token, cópialo y pégalo aquí.</li>
         </ol>
@@ -40,7 +41,7 @@
       <form id="loginForm" class="login-form">
         <label for="token">Token de GitHub</label>
         <input id="token" type="password" autocomplete="off" required>
-        <label class="check"><input type="checkbox" id="remember"> Recordarme en este equipo</label>
+        <p class="token-note">Por seguridad, el token se olvida al cerrar la pestaña.</p>
         <button type="submit" class="btn btn-primary">Entrar</button>
         <p class="form-msg" id="loginMsg" aria-live="polite"></p>
       </form>

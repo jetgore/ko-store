@@ -614,6 +614,7 @@ select.needs-size { border-color: var(--hong); }
 /* Campo trampa para bots: fuera de la vista y del lector de pantalla */
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .form-msg:empty { display: none; }
+.ko-turnstile { min-height: 65px; }
 .btn[hidden] { display: none; }
 button[type="submit"]:disabled { opacity: .6; cursor: wait; }
 .contact-form, .review-form { display: grid; gap: 16px; max-width: 62ch; }

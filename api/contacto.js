@@ -9,7 +9,7 @@
 const { limpiar, emailValido, revisarEnvio } = require('./_lib');
 
 module.exports = async (req, res) => {
-  const body = revisarEnvio(req, res);
+  const body = await revisarEnvio(req, res);
   if (!body) return;
 
   const tipo = body.tipo === 'club' ? 'club' : 'contacto';

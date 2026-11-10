@@ -57,8 +57,28 @@
   // Formularios que se envían a una función de Vercel: <form data-envio="/api/...">
   // Los campos con name se mandan como JSON. data-ok es el mensaje de éxito ({email} se reemplaza).
   // Trampas para bots: campo oculto "sitio" y tiempo mínimo desde que se abrió la página.
+  // Cloudflare Turnstile (opcional): con KO_CONFIG.turnstile (clave de sitio) se muestra la
+  // verificación antes del botón y su respuesta viaja como "turnstile" (la revisa api/_lib.js).
+  const formsEnvio = document.querySelectorAll('form[data-envio]');
+  const widgets = new Map(); // form -> id del widget
+  if (cfg.turnstile && formsEnvio.length) {
+    window.koTurnstileListo = () => {
+      formsEnvio.forEach((form) => {
+        const box = document.createElement('div');
+        box.className = 'ko-turnstile';
+        form.querySelector('[type="submit"]').before(box);
+        widgets.set(form, window.turnstile.render(box, { sitekey: cfg.turnstile, theme: 'light', language: 'es' }));
+      });
+    };
+    const s = document.createElement('script');
+    s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=koTurnstileListo';
+    s.async = true;
+    s.defer = true;
+    document.head.appendChild(s);
+  }
+
   const abierto = Date.now();
-  document.querySelectorAll('form[data-envio]').forEach((form) => {
+  formsEnvio.forEach((form) => {
     const msg = form.querySelector('.form-msg');
     const btn = form.querySelector('[type="submit"]');
     const show = (text, isError) => {
@@ -77,6 +97,14 @@
       }
       const data = Object.fromEntries(new FormData(form));
       data.ms = Date.now() - abierto;
+      if (cfg.turnstile) {
+        data.turnstile = data['cf-turnstile-response'] || '';
+        delete data['cf-turnstile-response'];
+        if (!data.turnstile) {
+          show('Espera a que termine la verificación "No soy un robot" e intenta de nuevo.', true);
+          return;
+        }
+      }
       btn.disabled = true;
       show('Enviando…', false);
       try {
@@ -93,9 +121,15 @@
         show(`${err.message || 'No pudimos enviar el formulario.'} También puedes escribirnos a ${cfg.email}.`, true);
       } finally {
         btn.disabled = false;
+        // Cada respuesta de Turnstile sirve una sola vez
+        if (widgets.has(form) && window.turnstile) window.turnstile.reset(widgets.get(form));
       }
     });
   });
+
+  // Año del pie de página (en las páginas que no lo ponen por su cuenta)
+  const year = document.getElementById('year');
+  if (year && !year.textContent) year.textContent = new Date().getFullYear();
 
   // Texto de productos escapado antes de insertarlo como HTML
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>

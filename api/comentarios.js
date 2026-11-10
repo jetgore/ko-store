@@ -8,8 +8,10 @@
 
 const { limpiar, revisarEnvio } = require('./_lib');
 
+const MAX_PENDIENTES = 30; // comentarios abiertos por revisar antes de dejar de recibir
+
 module.exports = async (req, res) => {
-  const body = revisarEnvio(req, res);
+  const body = await revisarEnvio(req, res);
   if (!body) return;
 
   // Sin "@" para que GitHub no lo tome como mención a un usuario
@@ -28,6 +30,28 @@ module.exports = async (req, res) => {
     return res.status(503).json({ ok: false, error: 'Los comentarios no están disponibles en este momento.' });
   }
 
+  const gh = {
+    Accept: 'application/vnd.github+json',
+    Authorization: `Bearer ${GITHUB_TOKEN}`,
+    'User-Agent': 'ko-store',
+    'X-GitHub-Api-Version': '2022-11-28',
+  };
+
+  // Tope de comentarios por revisar: si alguien manda spam (aunque cambie de IP),
+  // no se llena el repositorio de issues. Al aprobar o rechazar se libera cupo.
+  try {
+    const owner = repo.split('/')[0];
+    const r = await fetch(`https://api.github.com/repos/${repo}/issues?state=open&creator=${encodeURIComponent(owner)}&per_page=100`, { headers: gh });
+    if (r.ok) {
+      const abiertos = (await r.json()).filter((i) => !i.pull_request && String(i.title).startsWith('[Comentario]'));
+      if (abiertos.length >= MAX_PENDIENTES) {
+        return res.status(429).json({ ok: false, error: 'Tenemos muchos comentarios por revisar. Intenta de nuevo en unos días.' });
+      }
+    }
+  } catch (err) {
+    console.error('Comentarios (conteo):', err.message); // si falla el conteo, se sigue
+  }
+
   const fecha = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Santiago' }); // AAAA-MM-DD
   // Datos para el panel, dentro de un comentario HTML (sin "<" ni ">" para que no se corte)
   const datos = JSON.stringify({ nombre, lugar, texto, fecha })
@@ -43,13 +67,7 @@ module.exports = async (req, res) => {
   try {
     const r = await fetch(`https://api.github.com/repos/${repo}/issues`, {
       method: 'POST',
-      headers: {
-        Accept: 'application/vnd.github+json',
-        Authorization: `Bearer ${GITHUB_TOKEN}`,
-        'Content-Type': 'application/json',
-        'User-Agent': 'ko-store',
-        'X-GitHub-Api-Version': '2022-11-28',
-      },
+      headers: { ...gh, 'Content-Type': 'application/json' },
       body: JSON.stringify(issue),
     });
     if (!r.ok) throw new Error(`GitHub respondió ${r.status}: ${await r.text()}`);

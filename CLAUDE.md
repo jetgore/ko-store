@@ -66,8 +66,16 @@ Consecuencia: **GitHub puede tener commits que no están en la copia local**. An
 - **Contacto y clubes** → `api/contacto.js` → correo con Resend a `CONTACTO_EMAIL`, con `reply_to` del visitante.
 - **Comentarios** → `api/comentarios.js` → issue `[Comentario] Nombre` en GitHub, con los datos en `<!-- ko-comentario {...} -->`. **No se publica nada sin aprobación**: en `admin.html` → Comentarios, "Aprobar" agrega el comentario a `comentarios.js` (un commit) y cierra el issue; "Rechazar" solo lo cierra. El panel solo considera los issues creados por el dueño del repositorio (la cuenta del token de la función).
 - El repositorio es público: los comentarios pendientes se ven como issues en GitHub. No se guarda el correo de quien comenta.
-- Variables de entorno en Vercel (Settings → Environment Variables): `RESEND_API_KEY`, `CONTACTO_EMAIL`, `CONTACTO_REMITENTE` (opcional), `GITHUB_TOKEN` (fine-grained del dueño, solo Issues: Read and write sobre el repo) y `GITHUB_REPO` (opcional). Sin ellas, los formularios responden "no disponible" y muestran el correo de `KO_CONFIG.email`.
-- El token del panel necesita Contents **e Issues** en Read and write.
+- Variables de entorno en Vercel (Settings → Environment Variables): `RESEND_API_KEY`, `CONTACTO_EMAIL`, `CONTACTO_REMITENTE` (opcional), `GITHUB_TOKEN` (fine-grained del dueño, solo Issues: Read and write sobre el repo), `GITHUB_REPO` (opcional) y `TURNSTILE_SECRET` (opcional, ver abajo). Sin las obligatorias, los formularios responden "no disponible" y muestran el correo de `KO_CONFIG.email`.
+- El token del panel necesita Contents **e Issues** en Read and write. Se guarda solo en `sessionStorage` (se olvida al cerrar la pestaña); no volver a guardarlo en `localStorage`.
+- **Protección contra spam** (`api/_lib.js`): además del campo trampa y el tiempo mínimo, cada IP puede enviar como máximo 5 formularios cada 10 minutos (en memoria, por instancia de la función; responde 429). `api/comentarios.js` deja de recibir comentarios cuando hay 30 pendientes de revisar.
+- **Cloudflare Turnstile** (opcional, "No soy un robot"): se activa poniendo la clave de sitio en `KO_CONFIG.turnstile` (`config.js`) y la clave secreta en la variable `TURNSTILE_SECRET` de Vercel. `comun.js` muestra el widget antes del botón de cada `form[data-envio]` y envía su respuesta como `turnstile`. Con una sola de las dos claves los formularios fallan: configurar ambas a la vez.
+
+## Seguridad
+
+- `vercel.json` define las cabeceras de todas las páginas: `Content-Security-Policy` (solo scripts propios y de `challenges.cloudflare.com`, estilos propios y de Google Fonts, `connect-src` a la API de GitHub, `frame-ancestors 'none'`), `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy` y `Permissions-Policy`.
+- Por la CSP: **no usar `<script>` en línea, atributos `on…=` ni `style="…"`** en el HTML ni en el HTML generado por JS. Si se agrega un servicio externo (pagos, analítica, un CDN), sumar su dominio a la directiva que corresponda en `vercel.json` y probarlo.
+- Los bloques `<script type="application/ld+json">` sí están permitidos (no se ejecutan).
 
 ## SEO y páginas generadas
 
@@ -111,4 +119,4 @@ Vercel publica `main` automáticamente en 1 o 2 minutos.
 - `whatsapp` e `instagram` vacíos en `config.js`: mientras estén vacíos, el botón flotante y esos enlaces se ocultan.
 - 12 productos sin foto.
 - Configurar en Vercel las variables de entorno de los formularios (ver "Formularios y comentarios").
-- Sin límite de envíos por IP en las funciones: si llega spam, agregar un captcha (por ejemplo Cloudflare Turnstile).
+- Activar Cloudflare Turnstile (clave de sitio en `config.js` + `TURNSTILE_SECRET` en Vercel) y, si llega spam igual, una regla de límite de envíos sobre `/api/*` en Vercel → Firewall.

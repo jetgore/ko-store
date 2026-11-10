@@ -27,12 +27,15 @@
   let changes = [];       // resumen de cambios para el mensaje del commit
 
   // ---------- Almacenamiento del token (puede no estar disponible) ----------
+  // Solo en sessionStorage: se borra al cerrar la pestaña. El token permite publicar en el
+  // repositorio (y por lo tanto cambiar la web), así que no se deja guardado en el equipo.
+  try { localStorage.removeItem(TOKEN_KEY); } catch (e) { /* token antiguo de "Recordarme" */ }
   const store = {
     get() {
-      try { return sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY); } catch (e) { return null; }
+      try { return sessionStorage.getItem(TOKEN_KEY); } catch (e) { return null; }
     },
-    set(v, remember) {
-      try { (remember ? localStorage : sessionStorage).setItem(TOKEN_KEY, v); } catch (e) { /* sin almacenamiento */ }
+    set(v) {
+      try { sessionStorage.setItem(TOKEN_KEY, v); } catch (e) { /* sin almacenamiento */ }
     },
     clear() {
       try { sessionStorage.removeItem(TOKEN_KEY); localStorage.removeItem(TOKEN_KEY); } catch (e) { /* sin almacenamiento */ }
@@ -228,13 +231,13 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
     return 'No se pudo conectar con GitHub. Revisa tu conexión e intenta de nuevo.';
   }
 
-  async function enter(t, remember) {
+  async function enter(t) {
     token = t;
     $('loginMsg').classList.remove('error');
     $('loginMsg').textContent = 'Cargando productos…';
     try {
       await loadProducts();
-      if (remember !== undefined) store.set(t, remember);
+      store.set(t);
       showPanel();
     } catch (err) {
       token = null;
@@ -634,7 +637,7 @@ window.KO_COMENTARIOS = ${JSON.stringify(list, null, 2)};
   $('loginForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const t = $('token').value.trim();
-    if (t) enter(t, $('remember').checked);
+    if (t) enter(t);
   });
   $('logout').addEventListener('click', () => {
     if (isDirty() && !confirm('Tienes cambios sin publicar. ¿Salir igual?')) return;

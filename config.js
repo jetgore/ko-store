@@ -11,6 +11,9 @@ window.KO_CONFIG = {
   // Repositorio donde el panel (admin.html) guarda los productos y las fotos
   repo: 'jetgore/ko-store',
   rama: 'main',
+  // Clave de sitio de Cloudflare Turnstile (verificación "No soy un robot" en los formularios).
+  // Vacío = desactivado. Si la pones, define también TURNSTILE_SECRET en Vercel.
+  turnstile: '',
   aviso: {
     texto: 'Black Friday KO Store: viernes 27 de noviembre',
     enlace: 'tienda.html',

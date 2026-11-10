@@ -7,6 +7,7 @@
 .admin h1 { font-weight: 850; font-stretch: 112%; font-size: clamp(1.8rem, 3.5vw, 2.4rem); line-height: 1.1; }
 .admin code { font-size: .9em; background: var(--mist); padding: 1px 6px; border-radius: 3px; }
 .btn-sm { min-height: 38px; padding: 0 14px; font-size: .88rem; }
+.token-note { margin: 0; font-size: .9rem; color: var(--ink-soft); }
 .check { display: flex; align-items: center; gap: 10px; font-size: .95rem; cursor: pointer; }
 .check input { width: 18px; height: 18px; min-height: 0; margin: 0; accent-color: var(--ink); }
 .link-btn { background: none; border: 0; padding: 4px; font: inherit; font-size: .9rem; font-weight: 600; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
