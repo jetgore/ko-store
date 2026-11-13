@@ -126,7 +126,11 @@
         show((form.dataset.ok || '¡Listo! Recibimos tu mensaje.').replace('{email}', data.email || ''), false);
         form.dispatchEvent(new CustomEvent('ko-envio-ok', { detail: { data, out } }));
       } catch (err) {
-        show(`${err.message || 'No pudimos enviar el formulario.'} También puedes escribirnos a ${cfg.email}.`, true);
+        // fetch lanza TypeError cuando no hay conexión o el servidor no responde ("Failed to fetch")
+        const motivo = err instanceof TypeError
+          ? 'No pudimos conectar con la tienda. Revisa tu conexión e intenta de nuevo.'
+          : err.message || 'No pudimos enviar el formulario.';
+        show(`${motivo} También puedes escribirnos a ${cfg.email}.`, true);
       } finally {
         btn.disabled = false;
         // Cada respuesta de Turnstile sirve una sola vez
