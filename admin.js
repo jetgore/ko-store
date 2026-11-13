@@ -13,6 +13,8 @@
   const MAX_FOTOS = 8;
 
   const $ = (id) => document.getElementById(id);
+  // Secciones del panel: una por cada botón de la barra de pestañas
+  const TABS = [...document.querySelectorAll('#tabs [data-tab]')].map((b) => b.dataset.tab);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const fmt = (n) => '$' + Number(n).toLocaleString('es-CL');
@@ -43,8 +45,8 @@
   };
 
   // ---------- GitHub ----------
-  async function gh(path, opts = {}) {
-    const res = await fetch(API + path, {
+  async function ghUrl(url, opts = {}) {
+    const res = await fetch(url, {
       ...opts,
       cache: 'no-store',
       headers: {
@@ -60,6 +62,7 @@
     }
     return res.status === 204 ? null : res.json();
   }
+  const gh = (path, opts) => ghUrl(API + path, opts);
 
   const decode = (b64) => new TextDecoder().decode(
     Uint8Array.from(atob(b64.replace(/\s/g, '')), (c) => c.charCodeAt(0)));
@@ -188,7 +191,7 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
         <td><div class="thumb">${p.fotos[0]
           ? `<img src="${esc(photoSrc(p.fotos[0]))}" alt="" class="${p.fit === 'cover' ? 'cover' : ''}">`
           : '<span>Sin foto</span>'}</div>${p.fotos.length > 1 ? `<p class="thumb-count">${p.fotos.length} fotos</p>` : ''}</td>
-        <td><p class="row-name">${esc(p.name)}</p><p class="row-cat">${esc(CATS[p.cat] || p.cat)}${p.etiqueta ? ` · <span class="pill pill-${esc(p.etiqueta)}">${p.etiqueta === 'oferta' ? 'Oferta' : 'Nuevo'}</span>` : ''}</p></td>
+        <td><p class="row-name">${esc(p.name)}</p><p class="row-cat">${esc(CATS[p.cat] || p.cat)}${Number.isInteger(p.stock) ? ` · <span class="${p.stock ? '' : 'sin-stock'}">Stock: ${p.stock}</span>` : ''}${p.etiqueta ? ` · <span class="pill pill-${esc(p.etiqueta)}">${p.etiqueta === 'oferta' ? 'Oferta' : 'Nuevo'}</span>` : ''}</p></td>
         <td class="row-price">${fmt(p.price)}${p.oldPrice ? `<s>${fmt(p.oldPrice)}</s>` : ''}</td>
         <td><label class="switch"><input type="checkbox" data-act="activo" ${p.activo !== false ? 'checked' : ''} aria-label="Visible: ${esc(p.name)}"><span></span></label></td>
         <td><label class="switch"><input type="checkbox" data-act="destacado" ${p.destacado ? 'checked' : ''} aria-label="Destacado: ${esc(p.name)}"><span></span></label></td>
@@ -211,13 +214,12 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
     showTab('panel');
     render();
     loadComentarios();
+    document.dispatchEvent(new CustomEvent('ko-admin-entra')); // admin-pedidos.js carga los pedidos
   }
   function showLogin(message = '') {
     $('login').hidden = false;
     $('tabs').hidden = true;
-    $('panel').hidden = true;
-    $('comentarios').hidden = true;
-    $('importacion').hidden = true;
+    TABS.forEach((id) => { $(id).hidden = true; });
     $('logout').hidden = true;
     $('publishBar').hidden = true;
     $('loginMsg').textContent = message;
@@ -295,6 +297,7 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
     $('f-cat').value = d.cat;
     $('f-price').value = d.price ?? '';
     $('f-old').value = d.oldPrice ?? '';
+    $('f-stock').value = d.stock ?? '';
     $('f-spec').value = d.spec || '';
     $('f-desc').value = d.desc || '';
     $('f-etiqueta').value = d.etiqueta || '';
@@ -365,6 +368,8 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
     if (!editing && products.some((p) => p.id === id)) return void (msg.textContent = 'Ya existe un producto con ese código.');
     if (!$('f-price').value || price <= 0) return void (msg.textContent = 'Escribe un precio mayor a cero.');
     if (oldPrice && oldPrice <= price) return void (msg.textContent = 'El precio anterior debe ser mayor que el precio actual.');
+    const stock = $('f-stock').value.trim() === '' ? null : Math.round(Number($('f-stock').value));
+    if (stock !== null && !(stock >= 0)) return void (msg.textContent = 'El stock debe ser cero o más (o déjalo vacío para no controlarlo).');
     const destacado = $('f-destacado').checked;
     const otherDestacados = products.filter((p) => p.destacado && p !== editing).length;
     if (destacado && otherDestacados >= MAX_DESTACADOS) {
@@ -384,6 +389,7 @@ window.KO_PRODUCTOS = ${JSON.stringify(list, null, 2)};
     if ($('f-badge').value.trim()) p.badge = $('f-badge').value.trim();
     if ($('f-etiqueta').value) p.etiqueta = $('f-etiqueta').value;
     if (oldPrice) p.oldPrice = oldPrice;
+    if (stock !== null) p.stock = stock;
     if (destacado) p.destacado = true;
 
     if (editing) {
@@ -617,11 +623,49 @@ window.KO_COMENTARIOS = ${JSON.stringify(list, null, 2)};
 
   $('comReload').addEventListener('click', loadComentarios);
 
+  // ---------- Stock desde los pedidos ----------
+  // Al confirmar (o anular) un pedido se descuenta (o repone) el stock de los productos que
+  // lo controlan. Es un commit directo sobre productos.js, así que no puede haber cambios
+  // de productos sin publicar: se pisarían entre sí.
+  async function ajustarStock(items, signo, message) {
+    if (isDirty()) {
+      const err = new Error('Hay cambios de productos sin publicar');
+      err.dirty = true;
+      throw err;
+    }
+    const file = await gh(`/contents/${FILE}?ref=${encodeURIComponent(cfg.rama)}`);
+    const list = parseFile(decode(file.content));
+    // Lo que de verdad se movió (el stock no baja de cero), para poder reponer lo mismo después
+    const movido = [];
+    items.forEach((i) => {
+      const p = list.find((x) => x.id === i.id);
+      if (!p || !Number.isInteger(p.stock)) return;
+      const qty = signo < 0 ? Math.min(p.stock, i.qty) : i.qty;
+      p.stock += signo * qty;
+      if (qty) movido.push({ id: i.id, qty });
+    });
+    if (movido.length) {
+      await gh(`/contents/${FILE}`, {
+        method: 'PUT',
+        body: JSON.stringify({ message, branch: cfg.rama, content: encode(serialize(list)), sha: file.sha }),
+      });
+      await loadProducts();
+      render();
+    }
+    return movido;
+  }
+
+  window.KOAdmin = {
+    ghRepo: (repo, path, opts) => ghUrl(`https://api.github.com/repos/${repo}${path}`, opts),
+    token: () => token,
+    products: () => products,
+    ajustarStock,
+    toast,
+  };
+
   // ---------- Pestañas ----------
   function showTab(tab) {
-    $('panel').hidden = tab !== 'panel';
-    $('comentarios').hidden = tab !== 'comentarios';
-    $('importacion').hidden = tab !== 'importacion';
+    TABS.forEach((id) => { $(id).hidden = id !== tab; });
     $('tabs').querySelectorAll('[data-tab]').forEach((b) => {
       if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
     });

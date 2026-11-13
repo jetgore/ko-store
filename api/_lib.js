@@ -51,6 +51,46 @@ async function turnstileValido(token, ip) {
   }
 }
 
+// Solo se aceptan envíos desde el mismo sitio (si el navegador manda el origen, debe ser el propio)
+function mismoSitio(req) {
+  const origin = req.headers.origin;
+  if (!origin) return true;
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+  try { return new URL(origin).host === host; } catch (e) { return false; }
+}
+
+// Cabeceras para la API de GitHub
+const ghHeaders = (token) => ({
+  Accept: 'application/vnd.github+json',
+  Authorization: `Bearer ${token}`,
+  'User-Agent': 'ko-store',
+  'X-GitHub-Api-Version': '2022-11-28',
+});
+
+// Envía un correo con Resend. Devuelve false si falta la configuración o si Resend falla.
+async function enviarCorreo({ to, subject, text, replyTo }) {
+  const { RESEND_API_KEY, CONTACTO_REMITENTE } = process.env;
+  if (!RESEND_API_KEY || !to) return false;
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: CONTACTO_REMITENTE || 'KO Store <onboarding@resend.dev>',
+        to: [to],
+        ...(replyTo ? { reply_to: replyTo } : {}),
+        subject,
+        text,
+      }),
+    });
+    if (!r.ok) throw new Error(`Resend respondió ${r.status}: ${await r.text()}`);
+    return true;
+  } catch (err) {
+    console.error('Correo:', err.message);
+    return false;
+  }
+}
+
 // Revisa método, origen, límite por IP, trampas para bots y Turnstile.
 // Devuelve el cuerpo o null si ya respondió.
 async function revisarEnvio(req, res) {
@@ -60,16 +100,9 @@ async function revisarEnvio(req, res) {
     return null;
   }
 
-  // Solo se aceptan envíos desde el mismo sitio
-  const origin = req.headers.origin;
-  const host = req.headers['x-forwarded-host'] || req.headers.host;
-  if (origin) {
-    let mismoSitio = false;
-    try { mismoSitio = new URL(origin).host === host; } catch (e) { /* origen inválido */ }
-    if (!mismoSitio) {
-      res.status(403).json({ ok: false, error: 'Origen no permitido.' });
-      return null;
-    }
+  if (!mismoSitio(req)) {
+    res.status(403).json({ ok: false, error: 'Origen no permitido.' });
+    return null;
   }
 
   let body = req.body;
@@ -104,4 +137,4 @@ async function revisarEnvio(req, res) {
   return body;
 }
 
-module.exports = { limpiar, emailValido, revisarEnvio };
+module.exports = { limpiar, emailValido, revisarEnvio, mismoSitio, ghHeaders, enviarCorreo };

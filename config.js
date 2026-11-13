@@ -11,6 +11,11 @@ window.KO_CONFIG = {
   // Repositorio donde el panel (admin.html) guarda los productos y las fotos
   repo: 'jetgore/ko-store',
   rama: 'main',
+  // Repositorio PRIVADO donde se guardan los pedidos simulados (un issue por pedido).
+  // Debe ser el mismo de la variable GITHUB_REPO_PEDIDOS en Vercel.
+  repoPedidos: 'jetgore/ko-store-pedidos',
+  // Datos del emisor que aparecen en la boleta simulada (vacío = no se muestra)
+  boleta: { razonSocial: 'KO Store', rut: '', giro: '', direccion: '' },
   // Clave de sitio de Cloudflare Turnstile (verificación "No soy un robot" en los formularios).
   // Vacío = desactivado. Si la pones, define también TURNSTILE_SECRET en Vercel.
   turnstile: '',

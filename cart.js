@@ -19,6 +19,7 @@
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(items)); } catch (e) { /* sin almacenamiento */ }
     render();
+    document.dispatchEvent(new CustomEvent('ko-cart')); // checkout.js vuelve a dibujar el resumen
   }
 
   // ---------- Panel ----------
@@ -43,7 +44,8 @@
     <div class="drawer-foot">
       <div class="drawer-total"><span>Subtotal</span><strong class="drawer-subtotal">$0</strong></div>
       <p class="drawer-ship"></p>
-      <button type="button" class="btn btn-primary drawer-pay">Enviar pedido</button>
+      <button type="button" class="btn btn-primary drawer-pay">Ir a pagar</button>
+      <button type="button" class="drawer-alt">O envía tu pedido por WhatsApp o correo</button>
       <p class="drawer-msg" aria-live="polite"></p>
     </div>`;
   document.body.append(overlay, drawer);
@@ -144,14 +146,22 @@
     save();
   });
 
-  drawer.querySelector('.drawer-pay').addEventListener('click', () => {
+  // Antes de pagar o enviar el pedido, todas las líneas con tallas deben tener una elegida
+  function faltaTalla() {
     const missing = items.find((i) => byId(i.id).sizes.length && !i.size);
     msg.classList.toggle('error', Boolean(missing));
-    if (missing) {
-      msg.textContent = `Elige la talla de "${byId(missing.id).name}" antes de pagar.`;
-      return;
-    }
-    // Sin pago en línea todavía: el pedido se envía armado por WhatsApp o, si no hay número, por correo
+    msg.textContent = missing ? `Elige la talla de "${byId(missing.id).name}" antes de pagar.` : '';
+    return Boolean(missing);
+  }
+
+  // Compra en línea (simulada, sin cobro real): sigue en checkout.html
+  drawer.querySelector('.drawer-pay').addEventListener('click', () => {
+    if (!faltaTalla()) location.href = 'checkout.html';
+  });
+
+  drawer.querySelector('.drawer-alt').addEventListener('click', () => {
+    if (faltaTalla()) return;
+    // El pedido se envía armado por WhatsApp o, si no hay número, por correo
     const cfg = window.KO_CONFIG;
     const lines = items.map((i) => {
       const p = byId(i.id);
@@ -180,6 +190,10 @@
     },
     open,
     format: fmt,
+    envioGratis: ENVIO_GRATIS,
+    // Líneas del carro con los datos del producto (para checkout.js)
+    items: () => items.map((i) => ({ ...i, product: byId(i.id) })),
+    clear() { items = []; save(); },
   };
 
   render();

@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Finalizar compra | KO Store</title>
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" type="image/png" href="recursosgraficos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Saltar al contenido</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a href="index.html" class="logo" aria-label="KO Store, inicio">
+        <img src="recursosgraficos/kostore-web.webp" alt="KO Store" width="131" height="48">
+      </a>
+      <nav class="nav" id="nav" aria-label="Principal">
+        <a href="index.html">Inicio</a>
+        <a href="tienda.html">Tienda</a>
+        <a href="index.html#clubes">Clubes</a>
+        <a href="ayuda.html">Ayuda</a>
+      </nav>
+      <button type="button" class="menu-toggle" aria-controls="nav" aria-expanded="false" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <button type="button" class="cart" aria-label="Abrir carro, 0 productos">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 4h2l2.4 11h11.2L21 7H6.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="9" cy="19.5" r="1.4" fill="currentColor"/><circle cx="17" cy="19.5" r="1.4" fill="currentColor"/></svg>
+        <span class="cart-count">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="shop-head">
+      <div class="wrap">
+        <h1>Finalizar compra</h1>
+        <p class="demo-banner"><strong>Compra simulada.</strong> Esta tienda está en modo de prueba: no se cobra dinero real, no se piden datos de tarjeta y no se despachan productos.</p>
+      </div>
+    </section>
+
+    <section class="checkout">
+      <div class="wrap">
+        <div class="checkout-empty" id="checkoutEmpty" hidden>
+          <p>Tu carro está vacío.</p>
+          <a href="tienda.html" class="btn btn-primary">Ir a la tienda</a>
+        </div>
+
+        <div class="checkout-grid" id="checkoutGrid">
+          <aside class="checkout-summary" aria-labelledby="sumTitle">
+            <h2 id="sumTitle">Tu pedido</h2>
+            <ul class="sum-list" id="sumList"></ul>
+            <dl class="sum-totals" aria-live="polite">
+              <div><dt>Subtotal</dt><dd id="sumSubtotal"></dd></div>
+              <div><dt>Envío</dt><dd id="sumEnvio"></dd></div>
+              <div class="total"><dt>Total</dt><dd id="sumTotal"></dd></div>
+            </dl>
+            <p class="sum-note" id="sumNote"></p>
+            <button type="button" class="link-plain" id="sumEdit">Modificar el carro</button>
+          </aside>
+
+          <form class="checkout-form" id="checkoutForm" novalidate data-envio="/api/pedidos"
+                data-ok="¡Pedido recibido! Te llevamos al detalle de tu pedido…">
+            <fieldset>
+              <legend>Tus datos</legend>
+              <div class="field">
+                <label for="co-nombre">Nombre y apellido</label>
+                <input id="co-nombre" name="nombre" type="text" autocomplete="name" maxlength="100" required>
+              </div>
+              <div class="row-fields">
+                <div class="field">
+                  <label for="co-email">Correo</label>
+                  <input id="co-email" name="email" type="email" autocomplete="email" maxlength="160" required
+                         data-error="Escribe un correo válido: ahí te avisamos cómo va tu pedido.">
+                </div>
+                <div class="field">
+                  <label for="co-tel">Teléfono</label>
+                  <input id="co-tel" name="telefono" type="tel" autocomplete="tel" maxlength="30" placeholder="+56 9 1234 5678" required>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Despacho</legend>
+              <div class="field">
+                <label for="co-dir">Dirección (calle, número, depto.)</label>
+                <input id="co-dir" name="direccion" type="text" autocomplete="street-address" maxlength="160" required>
+              </div>
+              <div class="row-fields">
+                <div class="field">
+                  <label for="co-comuna">Comuna</label>
+                  <input id="co-comuna" name="comuna" type="text" autocomplete="address-level2" maxlength="60" required>
+                </div>
+                <div class="field">
+                  <label for="co-region">Región</label>
+                  <select id="co-region" name="region" autocomplete="address-level1" required data-error="Elige la región del despacho.">
+                    <option value="">Elegir región</option>
+                    <option>Arica y Parinacota</option>
+                    <option>Tarapacá</option>
+                    <option>Antofagasta</option>
+                    <option>Atacama</option>
+                    <option>Coquimbo</option>
+                    <option>Valparaíso</option>
+                    <option>Metropolitana de Santiago</option>
+                    <option>O'Higgins</option>
+                    <option>Maule</option>
+                    <option>Ñuble</option>
+                    <option>Biobío</option>
+                    <option>La Araucanía</option>
+                    <option>Los Ríos</option>
+                    <option>Los Lagos</option>
+                    <option>Aysén</option>
+                    <option>Magallanes</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="co-notas">Indicaciones para la entrega (opcional)</label>
+                <textarea id="co-notas" name="notas" rows="2" maxlength="500"></textarea>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Pago simulado</legend>
+              <p class="pay-note">Elige cómo pagarías. No se pide ningún dato de tarjeta ni de cuenta.</p>
+              <label class="pay-option"><input type="radio" name="medio" value="webpay" checked> Webpay (simulado)</label>
+              <label class="pay-option"><input type="radio" name="medio" value="transferencia"> Transferencia (simulada)</label>
+            </fieldset>
+
+            <div class="hp" aria-hidden="true">
+              <label for="co-sitio">Sitio web</label>
+              <input id="co-sitio" name="sitio" type="text" tabindex="-1" autocomplete="off">
+            </div>
+            <button class="btn btn-primary" type="submit">Pagar y enviar pedido (simulado)</button>
+            <p class="form-msg" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <a href="index.html" class="logo" aria-label="KO Store, volver al inicio">
+          <img src="recursosgraficos/kostore-web.webp" alt="KO Store" width="164" height="60" loading="lazy">
+        </a>
+        <p class="muted">Equipamiento de taekwondo WT. Santiago, Chile.</p>
+      </div>
+      <nav aria-label="Tienda">
+        <h4>Tienda</h4>
+        <a href="tienda.html">Catálogo completo</a>
+        <a href="protecciones.html">Protecciones</a>
+        <a href="index.html#tallas">Guía de tallas</a>
+      </nav>
+      <nav aria-label="Ayuda">
+        <h4>Ayuda</h4>
+        <a href="ayuda.html#envios">Envíos y plazos</a>
+        <a href="ayuda.html#cambios">Cambios y devoluciones</a>
+        <a href="ayuda.html#preguntas">Preguntas frecuentes</a>
+      </nav>
+      <nav aria-label="Contacto">
+        <h4>Contacto</h4>
+        <a href="ayuda.html#contacto">Formulario de contacto</a>
+        <a href="mailto:contacto@kostore.cl">contacto@kostore.cl</a>
+        <a href="#" data-link="instagram">Instagram</a>
+        <a href="#" data-link="whatsapp">WhatsApp</a>
+      </nav>
+    </div>
+    <div class="wrap footer-bottom">
+      <p class="muted">© <span id="year">2026</span> KO Store</p>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="productos.js"></script>
+  <script src="catalogo.js"></script>
+  <script src="comun.js"></script>
+  <script src="cart.js"></script>
+  <script src="checkout.js"></script>
+</body>
+</html>

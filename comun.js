@@ -105,6 +105,13 @@
           return;
         }
       }
+      // "ko-envio" deja que la página agregue datos (el.detail.data) o cancele el envío
+      // con preventDefault() y un mensaje en detail.error (lo usa checkout.js)
+      const antes = new CustomEvent('ko-envio', { cancelable: true, detail: { data } });
+      if (!form.dispatchEvent(antes)) {
+        show(antes.detail.error || 'Revisa el formulario.', true);
+        return;
+      }
       btn.disabled = true;
       show('Enviando…', false);
       try {
@@ -117,6 +124,7 @@
         if (!res.ok || !out.ok) throw new Error(out.error || '');
         form.reset();
         show((form.dataset.ok || '¡Listo! Recibimos tu mensaje.').replace('{email}', data.email || ''), false);
+        form.dispatchEvent(new CustomEvent('ko-envio-ok', { detail: { data, out } }));
       } catch (err) {
         show(`${err.message || 'No pudimos enviar el formulario.'} También puedes escribirnos a ${cfg.email}.`, true);
       } finally {

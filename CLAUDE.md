@@ -21,13 +21,17 @@ Tienda online de equipamiento de taekwondo WT (Santiago, Chile). Sitio estático
 | `robots.txt` | Indica dónde está el sitemap |
 | `ayuda.html` | Envíos, cambios, preguntas frecuentes y formulario de contacto (`#contacto`) |
 | `admin.html` + `admin.js` + `admin.css` | Panel de productos y moderación de comentarios (ver más abajo). Tiene `noindex` y no se enlaza desde el sitio |
+| `checkout.html` + `checkout.js` | Finalizar compra **simulada** (sin cobro real ni datos de tarjeta). Envía el pedido a `/api/pedidos` |
+| `pedido.html` + `pedido.js` | Seguimiento del pedido para quien compra (`?n=número&c=clave`): estado, boleta simulada y despacho ficticio |
+| `admin-pedidos.js` | Pestañas "Pedidos" y "Boleta y despacho" del panel |
+| `pedidos-comun.js` | Estados, formato del issue y boleta (`KOPedidos`), compartido por `pedido.html` y el panel |
 | `productos.js` | **Datos de los productos** (`window.KO_PRODUCTOS`). Lo genera el panel |
 | `comentarios.js` | Comentarios aprobados (`window.KO_COMENTARIOS`). Lo genera el panel; solo lo carga `index.html` |
-| `api/` | Funciones de Vercel: `contacto.js` (correo con Resend), `comentarios.js` (crea el issue pendiente) y `_lib.js` (validación y trampas para bots; no es ruta) |
+| `api/` | Funciones de Vercel: `contacto.js` (correo con Resend), `comentarios.js` (crea el issue pendiente), `pedidos.js` (crea y consulta pedidos simulados), `pedido-aviso.js` (correo a quien compró), `_pedidos.js` (formato de los pedidos; no es ruta) y `_lib.js` (validación y trampas para bots; no es ruta) |
 | `catalogo.js` | Categorías (`KO_CATEGORIES`), juegos de tallas (`KO_TALLAS`) y `KO_CATALOG` (solo productos con `activo !== false`) |
 | `config.js` | Email, WhatsApp, Instagram, repositorio del panel y aviso superior (`KO_CONFIG`) |
 | `comun.js` | Común a todas las páginas: aviso superior, menú móvil, botón de WhatsApp, enlaces de contacto, envío de `form[data-envio]`, `KOEsc` y `KOProductCard` |
-| `cart.js` | Carro en `localStorage` (`ko-cart`) y panel lateral. "Enviar pedido" arma el pedido por WhatsApp o, sin número, por correo |
+| `cart.js` | Carro en `localStorage` (`ko-cart`) y panel lateral. "Ir a pagar" abre `checkout.html`; el enlace secundario arma el pedido por WhatsApp o, sin número, por correo |
 | `script.js` | Portada: destacados, conteo por categoría, calculadora de tallas y lista de comentarios |
 | `styles.css` | Estilos del sitio. Tokens en `:root` (`--chung`, `--hong`, `--ink`, etc.) |
 | `recursosgraficos/` | Imágenes en `.webp`. Fotos subidas desde el panel en `recursosgraficos/productos/` |
@@ -48,7 +52,7 @@ Todo se comunica con globales en `window` (`KO_CONFIG`, `KO_PRODUCTOS`, `KO_CATA
 
 ## Productos
 
-Campos de cada producto en `productos.js`: `id`, `cat`, `name`, `price`, `fotos` (lista; la primera es la principal; los antiguos `img`/`img2` se siguen leyendo), `fit` (`'cover'`), `short`, `spec`, `sizes` (`[]` = talla única), `badge`, `etiqueta` (`'nuevo'` | `'oferta'`), `oldPrice`, `activo`, `destacado` (máximo 4, se muestran en la portada), `desc` (descripción completa, opcional; se muestra en la página del producto).
+Campos de cada producto en `productos.js`: `id`, `cat`, `name`, `price`, `fotos` (lista; la primera es la principal; los antiguos `img`/`img2` se siguen leyendo), `fit` (`'cover'`), `short`, `spec`, `sizes` (`[]` = talla única), `badge`, `etiqueta` (`'nuevo'` | `'oferta'`), `oldPrice`, `activo`, `destacado` (máximo 4, se muestran en la portada), `stock` (entero opcional; sin el campo, el producto no controla stock), `desc` (descripción completa, opcional; se muestra en la página del producto).
 
 - `productos.js` debe mantener el formato exacto que escribe el panel: dos líneas de comentario y luego `window.KO_PRODUCTOS = <JSON>;`. El panel lo lee buscando el JSON después de `KO_PRODUCTOS`, así que debe seguir siendo JSON válido (comillas dobles, sin comentarios ni comas finales).
 - El `id` se usa en el carro guardado de los clientes: no cambiar el `id` de un producto existente.
@@ -66,8 +70,8 @@ Consecuencia: **GitHub puede tener commits que no están en la copia local**. An
 - **Contacto y clubes** → `api/contacto.js` → correo con Resend a `CONTACTO_EMAIL`, con `reply_to` del visitante.
 - **Comentarios** → `api/comentarios.js` → issue `[Comentario] Nombre` en GitHub, con los datos en `<!-- ko-comentario {...} -->`. **No se publica nada sin aprobación**: en `admin.html` → Comentarios, "Aprobar" agrega el comentario a `comentarios.js` (un commit) y cierra el issue; "Rechazar" solo lo cierra. El panel solo considera los issues creados por el dueño del repositorio (la cuenta del token de la función).
 - El repositorio es público: los comentarios pendientes se ven como issues en GitHub. No se guarda el correo de quien comenta.
-- Variables de entorno en Vercel (Settings → Environment Variables): `RESEND_API_KEY`, `CONTACTO_EMAIL`, `CONTACTO_REMITENTE` (opcional), `GITHUB_TOKEN` (fine-grained del dueño, solo Issues: Read and write sobre el repo), `GITHUB_REPO` (opcional) y `TURNSTILE_SECRET` (opcional, ver abajo). Sin las obligatorias, los formularios responden "no disponible" y muestran el correo de `KO_CONFIG.email`.
-- El token del panel necesita Contents **e Issues** en Read and write. Se guarda solo en `sessionStorage` (se olvida al cerrar la pestaña); no volver a guardarlo en `localStorage`.
+- Variables de entorno en Vercel (Settings → Environment Variables): `RESEND_API_KEY`, `CONTACTO_EMAIL`, `CONTACTO_REMITENTE` (opcional), `GITHUB_TOKEN` (fine-grained del dueño, solo Issues: Read and write sobre el repo y sobre el repo privado de pedidos), `GITHUB_REPO_PEDIDOS` (repo privado de pedidos), `GITHUB_REPO` (opcional) y `TURNSTILE_SECRET` (opcional, ver abajo). Sin las obligatorias, los formularios responden "no disponible" y muestran el correo de `KO_CONFIG.email`.
+- El token del panel necesita Contents **e Issues** en Read and write (Issues también sobre el repositorio de pedidos). Se guarda solo en `sessionStorage` (se olvida al cerrar la pestaña); no volver a guardarlo en `localStorage`.
 - **Protección contra spam** (`api/_lib.js`): además del campo trampa y el tiempo mínimo, cada IP puede enviar como máximo 5 formularios cada 10 minutos (en memoria, por instancia de la función; responde 429). `api/comentarios.js` deja de recibir comentarios cuando hay 30 pendientes de revisar.
 - **Cloudflare Turnstile** (opcional, "No soy un robot"): se activa poniendo la clave de sitio en `KO_CONFIG.turnstile` (`config.js`) y la clave secreta en la variable `TURNSTILE_SECRET` de Vercel. `comun.js` muestra el widget antes del botón de cada `form[data-envio]` y envía su respuesta como `turnstile`. Con una sola de las dos claves los formularios fallan: configurar ambas a la vez.
 
@@ -84,6 +88,18 @@ Consecuencia: **GitHub puede tener commits que no están en la copia local**. An
 - Las páginas de producto usan `<base href="/">`: dentro de ellas, las rutas relativas se resuelven desde la raíz.
 - Los textos de categoría y producto siguen la regla de no inventar datos del negocio.
 - Si el build falla, Vercel no publica y el sitio sigue con la versión anterior.
+
+## Pedidos simulados (venta, boleta y despacho)
+
+Todo el flujo es **de prueba**: no hay cobro real, no se piden datos de tarjeta, la boleta no tiene validez tributaria y el despacho es ficticio. Las páginas y los correos lo dicen explícitamente; no quitar esos avisos mientras no exista un pago real.
+
+- `checkout.html` envía el formulario con el código común (`data-envio="/api/pedidos"`); `checkout.js` agrega las líneas del carro en el evento `ko-envio` y redirige a `pedido.html` en `ko-envio-ok`.
+- `api/pedidos.js` valida los datos, **toma nombres y precios de `productos.js`** (nunca del navegador) y crea un issue `[Pedido] Nombre` con los datos en `<!-- ko-pedido {...} -->` en el repositorio de pedidos. El número del pedido es el del issue (`KO-0012`) y la `clave` aleatoria del enlace es lo que deja ver el pedido a quien compró.
+- **El repositorio de pedidos debe ser privado** (`KO_CONFIG.repoPedidos` y `GITHUB_REPO_PEDIDOS`, por defecto `jetgore/ko-store-pedidos`): los issues llevan nombre, correo, teléfono y dirección. No guardar pedidos en `jetgore/ko-store`, que es público. Sin `GITHUB_REPO_PEDIDOS`, la compra responde "no disponible".
+- Etapas (`estado`): `recibido` → `pagado` → `confirmado` → `boleta` → `despachado` → `entregado`, o `anulado`. El panel avanza reescribiendo el cuerpo del issue (`KOPedidos.cuerpo`, mismo formato que `api/_pedidos.js`: si se cambia uno, cambiar el otro) y cierra el issue al entregar o anular.
+- Panel → **Pedidos**: muestra el stock de cada línea, "Confirmar pago (simulado)" y "Confirmar pedido y avisar" (descuenta el stock de los productos que lo controlan con un commit a `productos.js` y guarda lo descontado en `stockDescontado` para reponerlo si se anula). Panel → **Boleta y despacho**: emite la boleta (folio correlativo, neto e IVA 19 % calculados desde el total) y registra transportista y número de seguimiento ficticio.
+- Avisos: cada cambio llama a `api/pedido-aviso.js` con el token del panel; la función solo acepta al dueño del repositorio y arma el correo desde el issue. Sin Resend (o sin dominio verificado, que solo deja enviar al correo de la cuenta) el aviso no sale, pero quien compró ve todo en `pedido.html`.
+- Mover stock desde un pedido exige no tener cambios de productos sin publicar en el panel.
 
 ## Desarrollo local
 
@@ -115,8 +131,9 @@ Vercel publica `main` automáticamente en 1 o 2 minutos.
 
 ## Pendiente
 
-- Pago en línea: hoy el pedido se cierra por WhatsApp o correo. Opciones evaluadas: Shopify (Buy Button o Storefront API) o Mercado Pago / Flow con una función en Vercel.
+- Pago en línea real: hoy la compra en `checkout.html` es simulada (ver "Pedidos simulados") y el pedido real se cierra por WhatsApp o correo. Opciones evaluadas: Shopify (Buy Button o Storefront API) o Mercado Pago / Flow con una función en Vercel.
 - `whatsapp` e `instagram` vacíos en `config.js`: mientras estén vacíos, el botón flotante y esos enlaces se ocultan.
 - 12 productos sin foto.
+- Pedidos simulados: crear el repositorio privado `jetgore/ko-store-pedidos`, definir `GITHUB_REPO_PEDIDOS` en Vercel y dar acceso a ese repo a los dos tokens. El stock es por producto (no por talla) y la tienda no muestra "agotado".
 - Configurar en Vercel las variables de entorno de los formularios (ver "Formularios y comentarios").
 - Activar Cloudflare Turnstile (clave de sitio en `config.js` + `TURNSTILE_SECRET` en Vercel) y, si llega spam igual, una regla de límite de envíos sobre `/api/*` en Vercel → Firewall.

@@ -697,3 +697,126 @@ button[type="submit"]:disabled { opacity: .6; cursor: wait; }
 @media (max-width: 760px) {
   .pdp-grid { grid-template-columns: 1fr; }
 }
+
+/* =========================================================
+   Compra simulada: carro, checkout, seguimiento y boleta
+   ========================================================= */
+.drawer-alt, .link-plain {
+  background: none; border: 0; padding: 4px 0; font: inherit; font-size: .88rem; font-weight: 600;
+  color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
+.drawer-alt:hover, .link-plain:hover { color: var(--ink); }
+.drawer-alt { justify-self: center; }
+
+/* Aviso de que la compra es de prueba */
+.demo-banner {
+  margin-top: 18px; padding: 12px 16px; max-width: 70ch;
+  border-left: 3px solid var(--hong); border-radius: var(--radius);
+  background: var(--mist); font-size: .95rem;
+}
+
+/* ---------- Checkout ---------- */
+.checkout { padding: 8px 0 clamp(64px, 9vw, 112px); }
+.checkout-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: clamp(24px, 5vw, 64px); align-items: start; }
+.checkout-grid[hidden], .checkout-empty[hidden] { display: none; }
+.checkout-empty { display: grid; gap: 16px; justify-items: start; color: var(--ink-soft); }
+.checkout-form { display: grid; gap: 28px; grid-column: 1; grid-row: 1; }
+.checkout-form fieldset { margin: 0; padding: 0; border: 0; display: grid; gap: 16px; min-width: 0; }
+.checkout-form legend { padding: 0; margin-bottom: 14px; font-size: 1.25rem; font-weight: 750; }
+.checkout-form select { width: 100%; min-height: 48px; }
+.checkout-form .btn { justify-self: start; }
+.checkout-form .form-msg.error { color: var(--hong); }
+.pay-note { color: var(--ink-soft); font-size: .95rem; }
+.pay-option {
+  display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 16px;
+  border: 1.5px solid var(--line); border-radius: var(--radius); font-weight: 600; cursor: pointer;
+}
+.pay-option:has(input:checked) { border-color: var(--ink); }
+.pay-option input { width: 18px; height: 18px; min-height: 0; padding: 0; margin: 0; accent-color: var(--ink); }
+.checkout-summary {
+  grid-column: 2; grid-row: 1; position: sticky; top: 16px;
+  background: var(--mist); border-radius: var(--radius); padding: clamp(20px, 3vw, 28px);
+  display: grid; gap: 14px;
+}
+.checkout-summary h2 { font-size: 1.25rem; font-weight: 750; }
+.sum-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.sum-list li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; font-size: .95rem; line-height: 1.35; }
+.sum-qty { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.sum-price { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sum-totals, .ped-datos, .boleta-totales, .boleta-datos { margin: 0; display: grid; }
+.sum-totals > div, .ped-datos > div, .boleta-totales > div {
+  display: flex; justify-content: space-between; gap: 16px; padding: 8px 0;
+  border-top: 1px solid var(--line); font-size: .95rem;
+}
+.sum-totals dt, .ped-datos dt, .boleta-totales dt, .boleta-datos dt { color: var(--ink-soft); }
+.sum-totals dd, .ped-datos dd, .boleta-totales dd, .boleta-datos dd { margin: 0; font-weight: 650; text-align: right; overflow-wrap: anywhere; }
+.sum-totals .total, .ped-datos .total, .boleta-totales .total { border-top: 1.5px solid var(--ink); }
+.sum-totals .total dd, .ped-datos .total dd, .boleta-totales .total dd { font-size: 1.25rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.sum-totals .total dt, .ped-datos .total dt, .boleta-totales .total dt { color: var(--ink); font-weight: 650; }
+.sum-note { font-size: .85rem; color: var(--ink-soft); }
+.sum-note:empty { display: none; }
+.checkout-summary .link-plain { justify-self: start; }
+.ped-talla { display: inline-block; margin-left: 4px; padding: 0 8px; border-radius: 10px; background: var(--paper); border: 1px solid var(--line); font-size: .78rem; font-weight: 600; white-space: nowrap; }
+.ped-talla.falta { border-color: var(--hong); color: var(--hong); }
+
+/* ---------- Seguimiento del pedido ---------- */
+.pedido { padding: 8px 0 clamp(64px, 9vw, 112px); }
+.ped-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 5vw, 64px); align-items: start; }
+.ped-col { display: grid; gap: 16px; min-width: 0; }
+.ped-h { font-size: 1.25rem; font-weight: 750; }
+.ped-pasos { list-style: none; margin: 0; padding: 0; display: grid; }
+.ped-pasos li {
+  position: relative; display: grid; gap: 2px;
+  padding: 0 0 18px 30px; color: var(--ink-soft);
+}
+.ped-pasos li::before {
+  content: ""; position: absolute; left: 0; top: 4px; width: 16px; height: 16px;
+  border-radius: 50%; border: 2px solid var(--line); background: var(--paper);
+}
+.ped-pasos li::after { content: ""; position: absolute; left: 7px; top: 22px; bottom: 0; width: 2px; background: var(--line); }
+.ped-pasos li:last-child { padding-bottom: 0; }
+.ped-pasos li:last-child::after { display: none; }
+.ped-pasos li.hecho { color: var(--ink); }
+.ped-pasos li.hecho::before { background: var(--chung); border-color: var(--chung); }
+.ped-pasos li.actual .ped-paso { font-weight: 750; }
+.ped-pasos li.actual::before { box-shadow: 0 0 0 4px rgba(29,78,216,.2); }
+.ped-paso { font-weight: 600; }
+.ped-cuando { font-size: .88rem; color: var(--ink-soft); }
+.ped-anulado { padding: 12px 16px; border-left: 3px solid var(--hong); background: var(--mist); font-weight: 600; }
+.ped-nota { font-size: .85rem; color: var(--ink-soft); }
+.pedido .btn-update { justify-self: start; min-height: 40px; padding: 0 16px; font-size: .9rem; }
+.ped-guardados { margin: 12px 0 24px; padding-left: 20px; display: grid; gap: 6px; }
+.ped-items { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.ped-items th { text-align: left; font-size: .78rem; font-weight: 650; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .04em; padding: 8px 8px 8px 0; border-bottom: 1.5px solid var(--ink); }
+.ped-items td { padding: 10px 8px 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.ped-items th:last-child, .ped-items td:last-child { text-align: right; padding-right: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ped-items td:last-child { font-weight: 700; }
+
+/* ---------- Boleta simulada ---------- */
+.ped-boleta { margin-top: clamp(32px, 5vw, 56px); }
+.ped-boleta-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.ped-boleta-head .btn { min-height: 40px; padding: 0 16px; font-size: .9rem; }
+.boleta { max-width: 640px; border: 1.5px solid var(--ink); border-radius: var(--radius); padding: clamp(18px, 3vw, 32px); display: grid; gap: 16px; background: var(--paper); }
+.boleta-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; }
+.boleta-emisor { font-size: 1.25rem; font-weight: 800; }
+.boleta-dato { font-size: .88rem; color: var(--ink-soft); }
+.boleta-folio { border: 2px solid var(--hong); color: var(--hong); border-radius: var(--radius); padding: 8px 16px; text-align: center; font-weight: 650; font-size: .9rem; line-height: 1.4; }
+.boleta-folio strong { font-size: 1.05rem; }
+.boleta-aviso { text-align: center; font-size: .82rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--hong); border-block: 1px dashed var(--hong); padding: 6px 0; }
+.boleta-datos { grid-template-columns: 1fr 1fr; gap: 10px 24px; font-size: .92rem; }
+.boleta-datos dd { text-align: left; }
+.boleta-totales { justify-self: end; width: min(280px, 100%); }
+.boleta-totales > div:first-child { border-top: 0; }
+
+@media (max-width: 760px) {
+  .checkout-grid, .ped-grid { grid-template-columns: 1fr; }
+  .checkout-summary, .checkout-form { grid-column: 1; grid-row: auto; position: static; }
+  .checkout-form .btn { justify-self: stretch; }
+}
+
+/* Al imprimir desde el seguimiento, solo sale la boleta */
+@media print {
+  body:has(.boleta) > *:not(main), body:has(.boleta) .shop-head, body:has(.boleta) .ped-grid, .ped-boleta-head { display: none !important; }
+  .pedido { padding: 0; }
+  .ped-boleta { margin: 0; }
+}

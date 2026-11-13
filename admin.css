@@ -195,3 +195,31 @@
   .admin-tabs { overflow-x: auto; scrollbar-width: none; }
   .admin-tabs button { flex: none; padding: 10px 10px; }
 }
+
+/* ---------- Pedidos simulados, boleta y despacho ---------- */
+.ped-demo { margin-bottom: 8px; padding: 10px 14px; border-left: 3px solid var(--hong); border-radius: var(--radius); background: var(--paper); font-size: .92rem; }
+.ped-card { display: grid; gap: 4px; }
+.ped-card .com-meta { margin-top: 2px; overflow-wrap: anywhere; }
+.ped-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 6px; }
+.ped-num { font-weight: 800; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.ped-fecha { margin-left: auto; font-size: .85rem; color: var(--ink-soft); }
+.ped-estado { padding: 1px 10px; border-radius: 11px; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .02em; color: var(--paper); background: var(--ink-soft); }
+.ped-e-recibido { background: #B45309; }
+.ped-e-pagado, .ped-e-confirmado, .ped-e-boleta, .ped-e-despachado { background: var(--chung); }
+.ped-e-entregado { background: #15803D; }
+.ped-e-anulado { background: var(--hong); }
+.ped-card .ped-items { margin-top: 12px; }
+.ped-total { margin-top: 10px; font-size: .95rem; }
+.stock-ok { color: #15803D; font-weight: 650; }
+.stock-mal, .sin-stock { color: var(--hong); font-weight: 700; }
+.stock-nd { color: var(--ink-soft); }
+.ped-card .com-actions { gap: 10px 16px; }
+.ped-card a.link-btn { margin-left: auto; }
+.desp-form { flex: 1 1 100%; display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
+.desp-form .field label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: 4px; }
+.desp-form input { min-height: 40px; padding: 0 12px; font-size: .92rem; }
+@media (max-width: 760px) {
+  .desp-form { grid-template-columns: 1fr; }
+  .ped-card a.link-btn { margin-left: 0; }
+  .ped-fecha { margin-left: 0; flex-basis: 100%; }
+}
